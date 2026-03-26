@@ -59,6 +59,14 @@
   box-shadow: var(--shadow-gold-hover);
 }
 
+.about-info-block:hover .about-info-text h3 {
+  color: var(--gold-primary);
+}
+
+.about-info-block:hover .about-info-icon {
+  color: var(--gold-primary);
+}
+
 .about-info-icon {
   font-size: 1.8rem;
   flex-shrink: 0;
@@ -114,6 +122,10 @@
 .dept-row:hover {
   background: var(--bg-card);
   padding-left: 24px;
+}
+
+.dept-row:hover .dept-row-name {
+  color: var(--gold-primary);
 }
 
 .dept-row-name {
