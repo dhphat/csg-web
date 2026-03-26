@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi tiết Ban - Cóc Sài Gòn</title>
+  <meta name="description" content="Thông tin chi tiết về các ban của CLB Cóc Sài Gòn." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/department.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="department-main">
+    <!-- Rendered by JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const deptId = params.get('id');
+      const dept = DataManager.getDepartment(deptId);
+      const main = document.getElementById('department-main');
+
+      if (!dept) {
+        main.innerHTML = `
+          <section class="container" style="padding:100px 0;text-align:center;">
+            <h1 style="color:var(--text-gold);">Không tìm thấy</h1>
+            <a href="/about" class="btn-back"><i class="fas fa-arrow-left"></i> Về cóc</a>
+          </section>`;
+        return;
+      }
+
+      document.title = `${dept.name} - Cóc Sài Gòn`;
+
+      // Build teams HTML
+      const teamsHtml = (dept.teams || []).map((team, index) => `
+        <div class="dept-team-block ${index % 2 === 0 ? '' : 'reverse'} reveal">
+          <div class="dept-team-image">
+            <img src="${team.image}" alt="${team.name}" loading="lazy" />
+          </div>
+          <div class="dept-team-info">
+            <h3>${team.name}</h3>
+            <div class="dept-team-members">
+              ${(team.members || []).map(m => `
+                <div class="dept-member-row">
+                  <span class="dept-member-name">${m.name}</span>
+                  <span class="dept-member-role">${m.role}</span>
+                </div>
+              `).join('')}
+            </div>
+            <p class="dept-team-desc">${team.description || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      main.innerHTML = `
+        <!-- Hero -->
+        <section class="dept-hero">
+          <div class="container">
+            <a href="/about" class="btn-back"><i class="fas fa-arrow-left"></i> Về cóc</a>
+            <h1 class="dept-hero-title">${dept.name.toUpperCase()}</h1>
+            <p class="dept-hero-desc">${dept.description}</p>
+          </div>
+        </section>
+
+        <!-- Teams -->
+        <section class="dept-teams-section">
+          <div class="container">
+            ${teamsHtml || '<p style="color:var(--text-secondary);text-align:center;padding:40px 0;">Chưa có thông tin đội nhóm.</p>'}
+          </div>
+        </section>
+      `;
+
+      // Re-init scroll reveal for new elements
+      setTimeout(() => {
+        const reveals = document.querySelectorAll('.reveal:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }, 100);
+    });
+  </script>
+</body>
+</html>

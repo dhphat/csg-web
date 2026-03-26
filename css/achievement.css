@@ -1,0 +1,434 @@
+/* ===== Achievement Page Styles ===== */
+
+/* Prestigious Award Section */
+.award-hero {
+  padding: 80px 0 60px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.award-hero-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  margin-bottom: 48px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.award-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.award-card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  text-align: center;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.award-card:hover {
+  transform: translateY(-5px);
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.award-card img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s;
+}
+
+.award-card:hover h3 {
+  color: var(--gold-primary);
+}
+
+.award-card-info {
+  padding: 0;
+}
+
+.award-card-info h3 {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0;
+  transition: color 0.3s;
+}
+
+/* Project Stats Section */
+.project-stats-section {
+  padding: 60px 0;
+}
+
+.project-stat-card {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 40px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-normal);
+}
+
+.project-stat-card:hover {
+  box-shadow: var(--shadow-gold-hover);
+  border-color: var(--gold-primary);
+}
+
+.project-stat-card:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.project-stat-img {
+  width: 250px;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.project-stat-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.project-stat-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.stat-numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.stat-num {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num .number {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  line-height: 1;
+}
+
+.stat-num .label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.project-stat-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.sponsor-item:hover img {
+  filter: grayscale(0%) brightness(1);
+}
+
+.collaborators-section {
+  margin-top: 80px;
+  padding-top: 60px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.collaborators-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.collaborator-item {
+  width: 120px;
+  text-align: center;
+}
+
+.collaborator-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s;
+}
+
+.collaborator-item:hover .collaborator-avatar {
+  border-color: var(--gold-primary);
+}
+
+.collaborator-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.collaborator-name {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.show-more-container {
+  text-align: center;
+  margin: 40px 0 80px; /* More bottom margin to avoid clashing with general stat if it was there */
+}
+
+/* Ecosystem styles */
+.ecosystem-section {
+  padding: 60px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 40px;
+}
+
+.ecosystem-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+.ecosystem-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.eco-total-card {
+  background: linear-gradient(135deg, #1c180d 0%, #0d0b04 100%);
+  border: 1px solid var(--gold-primary);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  min-width: 250px;
+  flex: 1; /* Make it equal with others */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eco-total-card .number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  display: block;
+}
+
+.eco-total-card .label {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 8px;
+}
+
+.eco-channel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+  flex: 1; /* Make it equal with others */
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.eco-channel-card:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(255, 222, 33, 0.1);
+}
+
+.eco-channel-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #222;
+  flex-shrink: 0;
+}
+
+.eco-channel-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.eco-channel-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.eco-channel-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.eco-channel-followers {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  margin-top: 2px;
+}
+
+/* Sponsors and Collaborators centering */
+.sponsors-section {
+  padding: 80px 0;
+  background: var(--bg-secondary);
+  text-align: center;
+}
+
+.sponsors-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 48px;
+  text-transform: uppercase;
+}
+
+.sponsors-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sponsor-item {
+  width: 140px;
+  height: 80px;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.sponsor-item:hover {
+  border-color: var(--gold-primary);
+  box-shadow: 0 5px 15px rgba(255, 222, 33, 0.1);
+}
+
+.sponsor-item img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: grayscale(80%);
+  transition: filter 0.3s;
+}
+
+.sponsor-item:hover img {
+  filter: grayscale(0%);
+}
+
+/* Lightbox/Modal Style */
+.csg-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.csg-modal.active {
+  display: flex;
+}
+
+.csg-modal img {
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.csg-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #fff;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .award-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .award-hero-title {
+    font-size: 1.8rem;
+  }
+
+  .project-stat-card,
+  .project-stat-card:nth-child(even) {
+    flex-direction: column;
+  }
+
+  .project-stat-img {
+    width: 100%;
+    height: 200px;
+    min-height: unset;
+  }
+
+  .project-stat-content {
+    padding: 20px;
+  }
+
+  .stat-num .number {
+    font-size: 1.4rem;
+  }
+
+  .sponsor-item {
+    width: 110px;
+    height: 65px;
+  }
+}

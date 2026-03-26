@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cóc Sài Gòn - Trang chủ</title>
+  <meta name="description" content="Cóc Sài Gòn - Câu lạc bộ xuất sắc 7 năm liên tiếp. Nơi hội tụ và phát triển tài năng trẻ." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="home-main">
+    <!-- Rendered dynamically -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const h = data.home;
+      const projects = data.projects || [];
+      const categories = data.projectCategories || [];
+      const main = document.getElementById('home-main');
+
+      // 1. Hero Slides
+      const banners = h.hero.banners || [];
+      const slidesHtml = banners.map((b, idx) => `
+        <a href="${b.link}" class="hero-slide ${idx === 0 ? 'active' : ''}">
+          <img src="${b.bgImage}" alt="Hero Banner" class="hero-slide-img" />
+        </a>
+      `).join('');
+
+      const heroHtml = `
+        <section class="hero" id="hero">
+          <div class="slider-progress"><div class="slider-progress-bar" id="hero-progress"></div></div>
+          <div class="hero-slider">
+            ${slidesHtml}
+          </div>
+        </section>
+        <div class="hero-marquee-container" style="background-color: var(--gold-primary); color: #000; padding: 12px 0; overflow: hidden; position: relative; border-bottom: 2px solid #000;">
+          <div class="marquee-content hero-text-marquee" style="display: flex; width: max-content; font-weight: 700; font-size: 1.1rem; white-space: nowrap; text-transform: uppercase;">
+            <span style="padding-right: 0;">Câu lạc bộ truyền thông Cóc Sài Gòn &nbsp;&bull;&nbsp; Cocsaigon Communications Club &nbsp;&bull;&nbsp; </span>
+            <span style="padding-right: 0;">Câu lạc bộ truyền thông Cóc Sài Gòn &nbsp;&bull;&nbsp; Cocsaigon Communications Club &nbsp;&bull;&nbsp; </span>
+            <span style="padding-right: 0;">Câu lạc bộ truyền thông Cóc Sài Gòn &nbsp;&bull;&nbsp; Cocsaigon Communications Club &nbsp;&bull;&nbsp; </span>
+            <span style="padding-right: 0;">Câu lạc bộ truyền thông Cóc Sài Gòn &nbsp;&bull;&nbsp; Cocsaigon Communications Club &nbsp;&bull;&nbsp; </span>
+          </div>
+        </div>
+      `;
+
+      // 2. Ongoing Projects
+      const ongoing = projects.filter(p => p.ongoing);
+      let ongoingHtml = '';
+      if (ongoing.length > 0) {
+        const ongoingCards = ongoing.map(p => `
+          <a href="/project-detail?id=${p.id}" class="project-card-home reveal" style="display: flex; flex-direction: row; align-items: flex-start; height: 100%; gap: 24px;">
+            <div style="flex-shrink: 0; width: 220px; aspect-ratio: 4/5; border-radius: var(--radius-sm); overflow: hidden;">
+              <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; padding-top: 8px;">
+              <span style="font-size: 0.9rem; color: var(--gold-primary); text-transform: capitalize; margin-bottom: 8px; font-weight: 600;">${p.category}</span>
+              <h4 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
+              <span style="font-size: 0.95rem; color: var(--text-secondary);">${p.dateRange || p.monthYear || p.year}</span>
+              <div class="project-hover-desc">${p.description || ''}</div>
+            </div>
+          </a>
+        `).join('');
+        ongoingHtml = `
+          <section class="ongoing-projects section">
+            <div class="container">
+              <h2 class="section-title section-title-no-dot" style="font-size: 2rem; display: flex; align-items: center; gap: 12px;"><span class="live-dot"></span> Đang diễn ra</h2>
+              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+                ${ongoingCards}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 3. Recent Projects
+      const recent = projects.filter(p => !p.ongoing).slice(0, 4);
+      const recentCards = recent.map(p => `
+          <a href="/project-detail?id=${p.id}" class="project-card-home reveal" style="display:flex; flex-direction:column; height: 100%; transition: all var(--transition-fast);">
+            <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px; flex-shrink: 0;">
+              <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="text-align: left; padding: 0 8px; flex: 1;">
+              <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: capitalize; font-weight: 600; display: block; margin-bottom: 4px;">${p.category}</span>
+              <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">${p.monthYear || p.year}</span>
+              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.description || ''}</div>
+            </div>
+          </a>
+      `).join('');
+      const recentHtml = `
+          <section class="recent-projects section" style="background: var(--bg-secondary);">
+            <div class="container">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px; flex-wrap: wrap; gap: 16px;">
+                <h2 class="section-title" style="font-size: 2rem; margin-bottom: 0;">Dự án gần đây</h2>
+                <a href="/project" style="color: var(--text-secondary); font-size: 0.95rem; text-decoration: none; font-weight: 400; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--gold-primary)'" onmouseout="this.style.color='var(--text-secondary)'">Xem tất cả dự án &nbsp;↗</a>
+              </div>
+              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px;">
+                ${recentCards}
+              </div>
+            </div>
+          </section>
+      `;
+
+      // 4. Category Projects (Dự án chuyên mục)
+      const categoryCards = categories.map(c => `
+        <a href="/project-detail?id=${c.id}" class="project-logo-item reveal">
+          <img src="${c.logo}" alt="${c.name}" />
+          <span>${c.name}</span>
+        </a>
+      `).join('');
+      const categoriesHtml = `
+          <section class="category-projects section" style="overflow: hidden;">
+            <div class="container">
+              <h2 class="section-title" style="font-size: 2rem;">Chuyên mục</h2>
+            </div>
+            <div class="marquee-wrapper" style="overflow: hidden; position: relative; width: 100%;">
+              <div class="marquee-content category-marquee" style="display: flex; width: max-content; gap: 24px; padding-left: 24px;">
+                ${categoryCards}
+                ${categoryCards}
+                ${categoryCards}
+              </div>
+            </div>
+          </section>
+      `;
+
+      // 7. Stats
+      const statsCards = (h.stats?.items || []).map(s => `
+          <div class="stat-item reveal">
+            <div class="stat-number" data-count="${s.number}" data-suffix="${s.suffix}">${s.number}</div>
+            <div class="stat-label">${s.label}</div>
+          </div>
+      `).join('');
+      const statsHtml = `
+        <section class="stats-section" id="stats" style="background: var(--bg-secondary);">
+          <div class="container">
+            <h2 class="section-title section-title-center" style="display:block; text-align:center; font-size: 2rem;">Những con số</h2>
+            <div class="stats-grid">
+              ${statsCards}
+            </div>
+          </div>
+        </section>
+      `;
+
+      main.innerHTML = heroHtml + ongoingHtml + recentHtml + categoriesHtml + statsHtml;
+
+      // 8. Slider Logic
+      let currentSlide = 0;
+      const slides = document.querySelectorAll('.hero-slide');
+      const progressBar = document.getElementById('hero-progress');
+      const slideTime = 5000; // 5ms
+      let startTime = null;
+
+      const animateSlide = (now) => {
+        if (!startTime) startTime = now;
+        const elapsed = now - startTime;
+        const progress = Math.min((elapsed / slideTime) * 100, 100);
+        progressBar.style.width = progress + '%';
+
+        if (elapsed >= slideTime) {
+          startTime = now;
+          slides[currentSlide].classList.remove('active');
+          currentSlide = (currentSlide + 1) % slides.length;
+          slides[currentSlide].classList.add('active');
+          progressBar.style.width = '0%';
+        }
+        requestAnimationFrame(animateSlide);
+      };
+
+      if (slides.length > 1) {
+        requestAnimationFrame(animateSlide);
+      } else {
+        progressBar.style.width = '100%';
+      }
+
+      // Re-initialize counters and scroll reveal
+      setTimeout(() => {
+        if (window.CSG && window.CSG.animateCounters) window.CSG.animateCounters();
+        const reveals = document.querySelectorAll('.reveal:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }, 100);
+    });
+  </script>
+</body>
+</html>

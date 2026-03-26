@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ấn tượng - Cóc Sài Gòn</title>
+  <meta name="description" content="Thành tích và những con số ấn tượng của CLB Cóc Sài Gòn - CLB xuất sắc 7 năm liên tiếp." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/achievement.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="achievement-main">
+    <!-- Rendered dynamically -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const awards = data.awards || [];
+      const projects = (data.projects || []).filter(p => p.stats && Object.keys(p.stats).length > 0);
+      const collaborators = data.collaborators || [];
+      const mediaEcosystem = data.mediaEcosystem || { channels: [] };
+      const main = document.getElementById('achievement-main');
+
+      let visibleProjectsCount = 5;
+
+      const renderAwards = () => {
+        return awards.map(a => `
+          <div class="award-card reveal" onclick="openLightbox('${a.image}')">
+            <img src="${a.image}" alt="${a.title}" />
+            <div class="award-card-info">
+              <h3>${a.title}</h3>
+            </div>
+          </div>
+        `).join('');
+      };
+
+      const renderEcosystem = () => {
+        if (!mediaEcosystem.channels.length) return '';
+        return `
+          <div class="ecosystem-section">
+            <h2 class="ecosystem-title reveal">HỆ SINH THÁI TRUYỀN THÔNG ĐA DẠNG</h2>
+            <div class="ecosystem-grid">
+              <div class="eco-total-card reveal">
+                <span class="number" data-target="${mediaEcosystem.totalFollowers.replace(/\D/g, '')}">${mediaEcosystem.totalFollowers}</span>
+                <span class="label">Tổng cộng lượt theo dõi</span>
+              </div>
+              ${mediaEcosystem.channels.map(c => `
+                <a href="${c.url}" target="_blank" class="eco-channel-card reveal">
+                  <div class="eco-channel-logo">
+                    <img src="${c.logo}" alt="${c.name}" />
+                  </div>
+                  <div class="eco-channel-info">
+                    <span class="eco-channel-name">${c.name}</span>
+                    <span class="eco-channel-followers">${c.followers}</span>
+                  </div>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      };
+
+      const renderProjects = () => {
+        const labels = { reach: "Lượt tiếp cận", interactions: "Lượt tương tác", attendees: "Khán giả", contestants: "Thí sinh", entries: "Bài dự thi", tickets: "Vé đã bán" };
+        
+        const projectCards = projects.slice(0, visibleProjectsCount).map(p => {
+          const statItems = Object.entries(p.stats).map(([k, v]) => `
+            <div class="stat-num">
+              <span class="number" data-target="${v.toString().replace(/\D/g, '')}">${v}</span>
+              <span class="label">${labels[k] || k}</span>
+            </div>
+          `).join('');
+
+          return `
+            <div class="project-stat-card reveal">
+              <img src="${p.image}" alt="${p.title}" class="project-stat-img" />
+              <div class="project-stat-content">
+                <h3 class="project-stat-title">${p.title}</h3>
+                <div class="stat-numbers-grid">
+                  ${statItems}
+                </div>
+                <p class="project-stat-desc">${p.description || ''}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="container">
+            <h2 class="section-title section-title-center reveal" style="font-size: 2rem; margin-bottom: 48px; text-transform: uppercase;">THÀNH TÍCH DỰ ÁN</h2>
+            ${projectCards}
+            ${visibleProjectsCount < projects.length ? `
+              <div class="show-more-container">
+                <button class="btn btn-outline" id="load-more-btn">Xem thêm</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      };
+
+      const renderCollaborators = () => {
+        if (collaborators.length === 0) return '';
+        return `
+          <div class="collaborators-section">
+            <h2 class="sponsors-title" style="text-align: center;">ĐÃ HỢP TÁC CÙNG</h2>
+            <div class="collaborators-grid">
+              ${collaborators.map(c => `
+                <div class="collaborator-item reveal">
+                  <div class="collaborator-avatar">
+                    <img src="${c.photo}" alt="${c.name}" />
+                  </div>
+                  <div class="collaborator-name">${c.name}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      };
+
+      const renderPage = () => {
+        const awardsHtml = `
+          <section class="award-hero" id="award-hero">
+            <div class="container">
+              <h1 class="award-hero-title fade-in-up">CLB XUẤT SẮC 7 NĂM LIÊN TIẾP</h1>
+              <div class="award-grid">
+                ${renderAwards()}
+              </div>
+              ${renderEcosystem()}
+            </div>
+          </section>
+        `;
+
+        const statsHtml = `
+          <section class="project-stats-section" id="project-stats">
+            ${renderProjects()}
+          </section>
+        `;
+
+        const partnersHtml = `
+          <section class="sponsors-section" id="sponsors" style="padding: 80px 0; background: var(--bg-secondary);">
+            <div class="container">
+              <h2 class="sponsors-title" style="text-align: center;">NHÀ TÀI TRỢ VÀ ĐỐI TÁC</h2>
+              <div class="sponsors-grid">
+                ${['KOTV','RuBy','Mons','MixiGaming','KAPINT','W Hotel','Heineken','H118','be','UNIACE','ImUnique']
+                  .map(s => `<div class="sponsor-item"><img src="https://via.placeholder.com/120x60/1a1a1a/f0f0f0?text=${s}" alt="${s}" /></div>`).join('')}
+              </div>
+              ${renderCollaborators()}
+            </div>
+          </section>
+        `;
+
+        const modalHtml = `
+          <div id="award-modal" class="csg-modal" onclick="closeLightbox()">
+            <span class="csg-modal-close">&times;</span>
+            <img id="modal-img" src="" alt="Full view" />
+          </div>
+        `;
+
+        main.innerHTML = awardsHtml + statsHtml + partnersHtml + modalHtml;
+        bindEvents();
+      };
+
+      const bindEvents = () => {
+        const btn = document.getElementById('load-more-btn');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            visibleProjectsCount += 5;
+            document.getElementById('project-stats').innerHTML = renderProjects();
+            bindEvents();
+            initReveal();
+            if (window.CSG && window.CSG.animateCounters) window.CSG.animateCounters();
+          });
+        }
+      };
+
+      const initReveal = () => {
+        const reveals = document.querySelectorAll('.reveal:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      };
+
+      window.openLightbox = (src) => {
+        const modal = document.getElementById('award-modal');
+        const img = document.getElementById('modal-img');
+        modal.classList.add('active');
+        img.src = src;
+      };
+
+      window.closeLightbox = () => {
+        document.getElementById('award-modal').classList.remove('active');
+      };
+
+      renderPage();
+      setTimeout(() => {
+        if (window.CSG && window.CSG.animateCounters) window.CSG.animateCounters();
+        initReveal();
+      }, 100);
+    });
+  </script>
+</body>
+</html>

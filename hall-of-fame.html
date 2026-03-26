@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vinh danh - Cóc Sài Gòn</title>
+  <meta name="description" content="Vinh danh ban chủ nhiệm và các thành viên xuất sắc của CLB Cóc Sài Gòn." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/hall-of-fame.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="hof-main">
+    <!-- Rendered dynamically via JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const hallOfFame = data.hallOfFame || { individuals: { yearly: [], semesters: [] }, collectives: [] };
+      const main = document.getElementById('hof-main');
+
+      const createCard = (recipient, image, title) => `
+        <div class="hof-card-compact reveal" style="text-align: center; background: #222222; box-shadow: 0 8px 24px rgba(0,0,0,0.6); padding: 16px; border-radius: var(--radius-md); border: 1px solid #444444; transition: all var(--transition-fast);">
+          <div style="aspect-ratio: 1/1; width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px; border: 1px solid rgba(255, 222, 33, 0.3);">
+            <img src="${image}" alt="${recipient}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${recipient}</div>
+          <div style="font-size: 0.8rem; color: var(--gold-primary); text-transform: uppercase; font-weight: 600;">${title}</div>
+        </div>
+      `;
+
+      // 1. Hero
+      const heroHtml = `
+        <section class="hof-hero" id="hof-hero" style="padding: 100px 0 60px 0; text-align: center;">
+          <div class="container">
+            <p class="hof-hero-subtitle fade-in-up" style="max-width: 800px; margin: 0 auto; font-size: 1.15rem; line-height: 1.8; color: var(--text-secondary);">
+              Nơi ghi nhận và tôn vinh những cá nhân, tập thể xuất sắc <br/> đã đóng góp vào sự phát triển của câu lạc bộ.
+            </p>
+          </div>
+        </section>
+      `;
+
+      // State
+      let currentMainTab = 'individuals'; // 'individuals' or 'collectives'
+      let currentSubTab = 'yearly'; // 'yearly' or 'semesters'
+      let currentSemester = 'ALL';
+
+      // Gather distinct semesters across all tabs
+      const allSemesters = new Set();
+      if(hallOfFame.individuals.semesters) hallOfFame.individuals.semesters.forEach(s => allSemesters.add(s.semester));
+      if(hallOfFame.collectives.semesters) hallOfFame.collectives.semesters.forEach(s => allSemesters.add(s.semester));
+      const semestersArray = Array.from(allSemesters);
+
+      const renderContent = () => {
+        let cardsHtml = '';
+        let filterHtml = '';
+
+        const dataSrc = currentMainTab === 'individuals' ? hallOfFame.individuals : hallOfFame.collectives;
+
+        if (currentSubTab === 'yearly') {
+          if (dataSrc && dataSrc.yearly) {
+            cardsHtml = dataSrc.yearly.map(y => 
+              y.categories.map(c => 
+                c.members.map(m => createCard(m.recipient, m.image, c.name + ' ' + y.year)).join('')
+              ).join('')
+            ).join('');
+          }
+        } else {
+          // Semesters
+          if (semestersArray.length > 0) {
+            let filterButtons = `<button class="filter-btn ${currentSemester === 'ALL' ? 'active' : ''}" data-sem="ALL" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">Tất cả học kỳ</button>`;
+            
+            semestersArray.forEach(sem => {
+              filterButtons += `<button class="filter-btn ${currentSemester === sem ? 'active' : ''}" data-sem="${sem}" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === sem ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">${sem}</button>`;
+            });
+
+            filterHtml = `
+              <div class="semester-filter" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                ${filterButtons}
+              </div>
+            `;
+          }
+
+          if (dataSrc && dataSrc.semesters) {
+            const filteredSemesters = currentSemester === 'ALL' 
+              ? dataSrc.semesters 
+              : dataSrc.semesters.filter(s => s.semester === currentSemester);
+
+            cardsHtml = filteredSemesters.map(s => 
+              s.categories.map(c => 
+                c.members.map(m => createCard(m.recipient, m.image, c.name + ' ' + s.semester)).join('')
+              ).join('')
+            ).join('');
+          }
+        }
+
+        const contentHtml = `
+          <section class="hof-content" style="padding-bottom: 80px;">
+            <div class="container">
+              <!-- Layout Header: Tabs -->
+              <div class="hof-tabs-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px; flex-wrap: wrap; gap: 16px;">
+                <div class="hof-main-tabs" style="display: flex; gap: 16px;">
+                  <button class="main-tab-btn btn btn-outline" data-main-tab="individuals" style="padding: 6px 20px; ${currentMainTab === 'individuals' ? 'background: var(--gold-primary); color: #000;' : ''}">Cá nhân</button>
+                  <button class="main-tab-btn btn btn-outline" data-main-tab="collectives" style="padding: 6px 20px; ${currentMainTab === 'collectives' ? 'background: var(--gold-primary); color: #000;' : ''}">Tập thể</button>
+                </div>
+                <!-- Always show Sub-tabs according to request -->
+                <div class="hof-sub-tabs" id="master-sub-tabs" style="display: flex; gap: 8px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: var(--radius-full);">
+                  <button class="sub-tab-btn" data-sub-tab="yearly" style="border-radius: var(--radius-full); border: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; padding: 6px 20px; transition: all 0.2s; ${currentSubTab === 'yearly' ? 'background: #fff; color: #000;' : 'background: transparent; color: var(--text-secondary);'}">Năm</button>
+                  <button class="sub-tab-btn" data-sub-tab="semesters" style="border-radius: var(--radius-full); border: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; padding: 6px 20px; transition: all 0.2s; ${currentSubTab === 'semesters' ? 'background: #fff; color: #000;' : 'background: transparent; color: var(--text-secondary);'}">Học kỳ</button>
+                </div>
+              </div>
+
+              ${filterHtml}
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; justify-content: start;">
+                ${cardsHtml || '<p style="color: var(--text-secondary); grid-column: 1/-1;">Chưa có dữ liệu cho mục này.</p>'}
+              </div>
+            </div>
+          </section>
+        `;
+
+        main.innerHTML = heroHtml + contentHtml;
+        bindEvents();
+      };
+
+      const bindEvents = () => {
+        document.querySelectorAll('.main-tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            currentMainTab = e.target.getAttribute('data-main-tab');
+            renderContent();
+          });
+        });
+
+        document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            currentSubTab = e.target.getAttribute('data-sub-tab');
+            currentSemester = 'ALL'; // Reset filter when switching
+            renderContent();
+          });
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            currentSemester = e.target.getAttribute('data-sem');
+            renderContent();
+          });
+        });
+
+        // Trigger reveal animations
+        setTimeout(() => {
+          const reveals = document.querySelectorAll('.reveal:not(.visible), .fade-in-up:not(.visible)');
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.1 });
+          reveals.forEach(el => observer.observe(el));
+        }, 50);
+      };
+
+      // Initial render
+      renderContent();
+
+    });
+  </script>
+</body>
+</html>

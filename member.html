@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thành viên - Cóc Sài Gòn</title>
+  <meta name="description" content="Các thành viên qua các thế hệ của CLB Cóc Sài Gòn." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/member.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="member-main">
+    <!-- Rendered dynamically via JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const boardGen = data.boardGenerations || [];
+      const main = document.getElementById('member-main');
+
+      const heroHtml = `
+        <section class="member-hero" id="member-hero" style="padding-bottom: 20px;">
+          <div class="container">
+            <p class="member-hero-subtitle fade-in-up" style="font-size: 1.15rem; color: var(--text-secondary); max-width: 800px; margin: 0 auto; line-height: 1.8;">
+              Những người dẫn dắt, định hướng và lan tỏa tinh thần Cóc Sài Gòn
+            </p>
+          </div>
+        </section>
+      `;
+
+      const presidents = data.presidents || [];
+      let presidentsHtml = '';
+      if (presidents.length > 0) {
+        presidentsHtml = `
+          <div class="container" style="padding: 40px 0 60px;">
+            <h2 class="section-title section-title-center fade-in-up" style="font-size: 2rem; color: var(--gold-primary); margin-bottom: 60px; text-transform: uppercase;">Chủ nhiệm qua các thời kỳ</h2>
+            <div class="presidents-grid reveal" style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: center;">
+              ${presidents.map(p => `
+                <div class="v2-member-card" style="position: relative; background: linear-gradient(180deg, #1c180d 0%, #0d0b04 100%); border-radius: 12px; width: calc(20% - 20px); min-width: 180px; padding: 46px 16px 20px; text-align: center; border: 1px solid rgba(255, 222, 33, 0.1); margin-top: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.4);">
+                  <div class="v2-member-avatar" style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); width: 70px; height: 70px; border-radius: 50%; border: 3px solid #050505; overflow: hidden; background: #111;">
+                    <img src="${p.photo || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop'}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                  </div>
+                  <div class="v2-member-name" style="color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: 6px;">${p.name}</div>
+                  <div class="v2-member-role" style="color: var(--gold-primary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">${p.gen}</div>
+                  <div style="color: #888; font-size: 0.75rem;">Nhiệm kỳ: ${p.term}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      const boardTitleHtml = `
+        <div class="container" style="padding: 40px 0 20px;">
+           <h2 class="section-title section-title-center reveal" style="font-size: 2rem; color: var(--gold-primary); text-transform: uppercase;">Ban chủ nhiệm hiện tại</h2>
+        </div>
+      `;
+
+      let genHtml = `
+        <div class="member-timeline-container" style="position: relative; max-width: 1200px; margin: 0 auto 80px; padding: 0 20px 0 60px;">
+          <div class="timeline-line" style="position: absolute; top: 0; bottom: 0; left: 26px; width: 2px; background: #333; z-index: 1;"></div>
+      `;
+
+      const colors = ['#FFDE21', '#FF6B00', '#0084FF', '#00D13B']; // Yellow, Orange, Blue, Green
+
+      boardGen.forEach((gen, index) => {
+        if (!gen.members || gen.members.length === 0) return;
+        
+        const dotColor = colors[index % colors.length];
+        
+        genHtml += `
+          <!-- Generation Row -->
+          <div class="timeline-row reveal" style="position: relative; display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 70px; z-index: 5;">
+            <div class="timeline-dot" style="position: absolute; left: -40px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: ${dotColor}; z-index: 10; box-shadow: 0 0 12px ${dotColor}; border: 2px solid #050505;"></div>
+            
+            ${gen.members.map(m => `
+              <div class="v2-member-card" style="position: relative; background: linear-gradient(180deg, #1c180d 0%, #0d0b04 100%); border-radius: 12px; width: calc(25% - 18px); min-width: 180px; padding: 46px 16px 20px; text-align: center; border: 1px solid rgba(255, 222, 33, 0.05); margin-top: 30px;">
+                <div class="v2-member-avatar" style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; border-radius: 50%; border: 3px solid #050505; overflow: hidden; background: #111;">
+                  <img src="${m.photo || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop'}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+                </div>
+                <div class="v2-member-name" style="color: #fff; font-size: 0.95rem; font-weight: 700; margin-bottom: 6px;">${m.name}</div>
+                <div class="v2-member-role" style="color: #aaaaaa; font-size: 0.75rem; line-height: 1.5;">${m.role}</div>
+                ${m.gen && !m.gen.includes('GEN') ? `<div style="color: #888; font-size: 0.7rem; margin-top: 4px;">${m.gen}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      });
+      
+      genHtml += `</div>`; // Close container
+
+      main.innerHTML = heroHtml + presidentsHtml + boardTitleHtml + genHtml;
+
+      setTimeout(() => {
+        // Init scroll reveal
+        const reveals = document.querySelectorAll('.reveal:not(.visible), .fade-in-up:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }, 100);
+    });
+  </script>
+</body>
+</html>

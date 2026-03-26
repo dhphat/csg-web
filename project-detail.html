@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi tiết dự án - Cóc Sài Gòn</title>
+  <meta name="description" content="Chi tiết dự án của CLB Cóc Sài Gòn." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/project-detail.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="project-detail-main">
+    <!-- Rendered by JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const projectId = params.get('id');
+      const project = DataManager.getProject(projectId);
+      const main = document.getElementById('project-detail-main');
+
+      if (!project) {
+        main.innerHTML = `
+          <section class="container" style="padding:100px 0;text-align:center;">
+            <h1 style="color:var(--text-gold);">Không tìm thấy dự án</h1>
+            <p style="color:var(--text-secondary);margin-top:16px;">Dự án bạn tìm không tồn tại.</p>
+            <a href="/project" class="btn-back" style="border-radius: var(--radius-md);"><i class="fas fa-arrow-left"></i> Quay lại danh sách dự án</a>
+          </section>`;
+        return;
+      }
+
+      document.title = `${project.title} - Cóc Sài Gòn`;
+
+      // Determine Tag
+      let projectTag = project.category;
+      if (project.year === 'Chuyên mục') {
+        projectTag = 'Chuyên mục';
+      }
+
+
+      // Build stats HTML
+      const statsEntries = Object.entries(project.stats || {});
+      const statsLabels = { reach: 'Lượt tiếp cận', interactions: 'Lượt tương tác', attendees: 'Khán giả', contestants: 'Thí sinh', entries: 'Bài dự thi', tickets: 'Vé đã bán', participants: 'Tham gia' };
+      const statsHtml = statsEntries.length ? `
+        <div class="project-detail-stats">
+          ${statsEntries.map(([k, v]) => `
+            <div class="stat-item">
+              <span class="stat-value">${v}</span>
+              <span class="stat-label">${statsLabels[k] || k}</span>
+            </div>
+          `).join('')}
+        </div>` : '';
+
+      // Build timeline HTML (Grid of equal boxes)
+      const timelineHtml = (project.milestones && project.milestones.length) ? `
+        <div class="project-milestones" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px;">
+          ${project.milestones.map(m => `
+            <div class="milestone-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
+              <span style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;">${m.label}</span>
+              <span style="color: var(--gold-primary); font-size: 1.1rem; font-weight: 700;">${m.date}</span>
+            </div>
+          `).join('')}
+        </div>` : '';
+
+      // Build gallery HTML
+      const galleryHtml = (project.gallery && project.gallery.length) ? `
+        <section class="project-detail-gallery" style="margin-top: 48px; border-top: 1px solid var(--border-color); padding-top: 48px;">
+          <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-gold); margin-bottom: 24px;">Hình ảnh dự án</h3>
+          <div class="gallery-grid">
+            ${project.gallery.map((img, idx) => `
+              <div class="gallery-item" data-index="${idx}">
+                <img src="${img}" alt="${project.title}" loading="lazy" />
+              </div>
+            `).join('')}
+          </div>
+        </section>` : '';
+
+      main.innerHTML = `
+        <!-- Banner fixed aspect ratio -->
+        <section class="project-detail-banner" style="width: 100%; aspect-ratio: 2000 / 734; overflow: hidden; background: #000;">
+          <img src="${project.image}" alt="${project.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+        </section>
+
+        <!-- Content -->
+        <section class="project-detail-content" style="padding-top: 48px;">
+          <div class="container">
+            <a href="/project" class="btn-back"><i class="fas fa-arrow-left"></i> Tất cả dự án</a>
+            
+            <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--text-primary); line-height: 1.2; margin-bottom: 8px;">${project.title}</h1>
+            <p class="project-subtitle" style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">${project.subtitle || ''}</p>
+            
+            <!-- Tag directly below title/subtitle -->
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 40px;">
+              <span class="project-badge" style="margin-bottom: 0;">${projectTag}</span>
+              <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">${project.year !== 'Chuyên mục' ? project.year : ''}</span>
+              ${project.link ? `<a href="${project.link}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--radius-full); background: var(--gold-primary); color: #000; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; margin-left: 8px;"><i class="fas fa-external-link-alt"></i> Liên kết dự án</a>` : ''}
+            </div>
+
+            <!-- Timeline/Milestones -->
+            ${timelineHtml}
+
+            <!-- Description -->
+            <div class="project-description" style="max-width: 800px; padding: 0 0 48px 0;">
+              <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-gold); margin-bottom: 16px;">Giới thiệu dự án</h3>
+              <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-secondary);">${project.description}</p>
+            </div>
+
+            <!-- Stats -->
+            ${statsHtml}
+
+            <!-- Gallery -->
+            ${galleryHtml}
+          </div>
+        </section>
+
+        <!-- Lightbox -->
+        <div id="lightbox" class="lightbox">
+          <div class="lightbox-content">
+            <button class="lightbox-close">&times;</button>
+            <img src="" alt="Full view" class="lightbox-img" id="lightbox-img" />
+            <div class="lightbox-nav">
+              <button class="lightbox-btn" id="prev-img"><i class="fas fa-chevron-left"></i></button>
+              <button class="lightbox-btn" id="next-img"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Lightbox Logic
+      const lightbox = document.getElementById('lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const closeBtn = lightbox.querySelector('.lightbox-close');
+      const prevBtn = document.getElementById('prev-img');
+      const nextBtn = document.getElementById('next-img');
+      let currentImgIdx = 0;
+
+      const openLightbox = (idx) => {
+        currentImgIdx = idx;
+        lightboxImg.src = project.gallery[currentImgIdx];
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      };
+
+      const closeLightbox = () => {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+      };
+
+      const navigateLightbox = (dir) => {
+        currentImgIdx = (currentImgIdx + dir + project.gallery.length) % project.gallery.length;
+        lightboxImg.src = project.gallery[currentImgIdx];
+      };
+
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('click', () => openLightbox(parseInt(item.dataset.index)));
+      });
+
+      closeBtn.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+      prevBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateLightbox(-1); });
+      nextBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateLightbox(1); });
+
+      // Keyboard nav
+      document.addEventListener('keydown', (e) => {
+        if (!lightbox.classList.contains('active')) return;
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navigateLightbox(-1);
+        if (e.key === 'ArrowRight') navigateLightbox(1);
+      });
+    });
+  </script>
+</body>
+</html>

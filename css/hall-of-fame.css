@@ -1,0 +1,142 @@
+/* ===== Hall of Fame Page Styles ===== */
+
+.hof-hero {
+  padding: 80px 0 40px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.hof-hero-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--gold-primary);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 20px rgba(212, 168, 67, 0.3);
+}
+
+.hof-hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hof-section {
+  padding: 40px 0;
+}
+
+.hof-category-title {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 2rem;
+  color: var(--gold-primary);
+  text-align: center;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.hof-category-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: var(--gold-primary);
+  opacity: 0.5;
+}
+
+.hof-sub-title {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  border-left: 4px solid var(--gold-primary);
+  padding-left: 12px;
+  font-weight: 600;
+}
+
+.hof-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.hof-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  text-align: center;
+  transition: all var(--transition-normal);
+}
+
+.hof-card:hover {
+  box-shadow: var(--shadow-gold-hover);
+  border-color: var(--gold-primary);
+}
+
+.hof-card img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hof-card-info {
+  padding: 16px;
+}
+
+.hof-card-info h4 {
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: 1.1rem;
+  color: var(--gold-primary);
+  margin-bottom: 8px;
+}
+
+.hof-card-info .recipient {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.hof-card-info .desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hof-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hof-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hof-category-title {
+    font-size: 1.6rem;
+  }
+  .hof-hero-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hof-grid {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

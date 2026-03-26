@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Về Cóc - Cóc Sài Gòn</title>
+  <meta name="description" content="Tìm hiểu về CLB Truyền thông Cóc Sài Gòn - lịch sử, giá trị cốt lõi và sứ mệnh." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/about.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="about-main">
+    <!-- Rendered by JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const about = data.about;
+      const departments = data.departments;
+      const main = document.getElementById('about-main');
+
+      // About info blocks
+      const blocksHtml = (about.blocks || []).map(b => `
+        <div class="about-info-block reveal">
+          <div class="about-info-icon"><i class="${b.icon}"></i></div>
+          <div class="about-info-text">
+            <h3>${b.title}</h3>
+            <p>${b.content}</p>
+          </div>
+        </div>
+      `).join('');
+
+      // Departments list
+      const deptsHtml = departments.map(dept => {
+        const subDepts = (dept.subDepts || []).map(s => `<span class="dept-sub-tag">${s}</span>`).join('');
+        return `
+          <a href="/department?id=${dept.id}" class="dept-row reveal">
+            <span class="dept-row-name">${dept.name}</span>
+            <span class="dept-row-subs">${subDepts}</span>
+            <i class="fas fa-chevron-right dept-row-arrow"></i>
+          </a>
+        `;
+      }).join('');
+
+      // Benefits
+      const benefitsHtml = (about.benefits?.items || []).map(b => `
+        <div class="benefit-card reveal">
+          <img src="${b.image}" alt="${b.title}" class="benefit-card-img" />
+          <h4>${b.title}</h4>
+          <p>${b.description}</p>
+        </div>
+      `).join('');
+
+      main.innerHTML = `
+        <!-- Quote Hero -->
+        <section class="about-quote-hero">
+          <div class="container">
+            <div class="quote-icon">✦</div>
+            <h1 class="about-quote fade-in-up">${about.quote}</h1>
+          </div>
+        </section>
+
+        <!-- Intro + Info blocks -->
+        <section class="about-info-section">
+          <div class="container">
+            <p class="about-intro-text reveal">${about.introText}</p>
+            <div class="about-info-grid">
+              ${blocksHtml}
+            </div>
+          </div>
+        </section>
+
+        <!-- Departments -->
+        <section class="about-departments-section">
+          <div class="container">
+            <div class="dept-list">
+              ${deptsHtml}
+            </div>
+          </div>
+        </section>
+
+        <!-- Benefits -->
+        <section class="about-benefits-section">
+          <div class="container">
+            <h2 class="benefits-title reveal">${about.benefits?.title || ''}</h2>
+            <div class="benefits-grid">
+              ${benefitsHtml}
+            </div>
+          </div>
+        </section>
+      `;
+
+      // Re-init scroll reveal
+      setTimeout(() => {
+        const reveals = document.querySelectorAll('.reveal:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }, 100);
+    });
+  </script>
+</body>
+</html>

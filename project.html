@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dự án - Cóc Sài Gòn</title>
+  <meta name="description" content="Các dự án chuyên môn và sự kiện nổi bật của CLB Cóc Sài Gòn." />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/project.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="site-header" id="header"></header>
+  <div class="header-spacer"></div>
+
+  <main id="project-main">
+    <!-- Rendered dynamically via JS -->
+  </main>
+
+  <footer class="site-footer" id="footer"></footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import DataManager from '/js/data-manager.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const data = DataManager.get();
+      const projects = data.projects || [];
+      const categories = data.projectCategories || [];
+      const main = document.getElementById('project-main');
+
+      // 1. Categories
+      const catCards = categories.map(c => `
+        <a href="/project-detail?id=${c.id}" class="project-category-item reveal">
+          <img src="${c.logo}" alt="${c.name}" />
+          <span class="category-name">${c.name}</span>
+        </a>
+      `).join('');
+      const catHtml = `
+        <section class="project-category-section" id="categories">
+          <div class="container">
+            <h2 class="section-title">Chuyên mục</h2>
+            <div class="project-category-grid">
+              ${catCards}
+            </div>
+          </div>
+        </section>
+      `;
+
+      // 2. Featured
+      const featured = projects.filter(p => p.featured);
+      let featuredHtml = '';
+      if(featured.length > 0) {
+        const featCards = featured.map(p => `
+          <a href="/project-detail?id=${p.id}" class="project-card reveal">
+            <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px;">
+              <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="text-align: left; padding: 0 4px;">
+              <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: capitalize; font-weight: 600; display: block; margin-bottom: 4px;">${p.category}</span>
+              <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">${p.dateRange || p.monthYear || p.year}</span>
+              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.description || ''}</div>
+            </div>
+          </a>
+        `).join('');
+        featuredHtml = `
+          <section class="featured-projects" id="featured">
+            <div class="container">
+              <h2 class="section-title">Sự kiện nổi bật</h2>
+              <div class="projects-grid">
+                ${featCards}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      // 3. All projects
+      const filteredProjects = projects.filter(p => p.year !== 'Chuyên mục');
+      
+      const yearsSet = new Set();
+      filteredProjects.forEach(p => p.year && yearsSet.add(p.year));
+      const years = Array.from(yearsSet).sort((a,b) => b.localeCompare(a));
+      
+      const filterTabs = `
+        <button class="filter-tab active" data-filter="all">Tất cả</button>
+        ${years.map(y => `<button class="filter-tab" data-filter="${y}">${y}</button>`).join('')}
+      `;
+
+      const projectCards = filteredProjects.map(p => `
+        <a href="/project-detail?id=${p.id}" class="project-card reveal" data-category="${p.year}">
+            <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px;">
+              <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+            <div style="text-align: left; padding: 0 4px;">
+              <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: capitalize; font-weight: 600; display: block; margin-bottom: 4px;">${p.category}</span>
+              <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">${p.dateRange || p.monthYear || p.year}</span>
+              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.description || ''}</div>
+            </div>
+        </a>
+      `).join('');
+
+      const allHtml = `
+        <section class="all-projects-section" id="all-projects">
+          <div class="container">
+            <h2 class="section-title">Tất cả dự án</h2>
+            <div class="filter-tabs" id="projectFilter">
+              ${filterTabs}
+            </div>
+            <div class="projects-grid" id="projectsGrid">
+              ${projectCards}
+            </div>
+          </div>
+        </section>
+      `;
+
+      main.innerHTML = catHtml + featuredHtml + allHtml;
+
+      setTimeout(() => {
+        if (window.CSG && window.CSG.initTabFilter) {
+          window.CSG.initTabFilter('#all-projects', '.filter-tab', '.project-card');
+        }
+        
+        // Init scroll reveal
+        const reveals = document.querySelectorAll('.reveal:not(.visible)');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+      }, 100);
+    });
+  </script>
+</body>
+</html>

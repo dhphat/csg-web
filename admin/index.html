@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - Cóc Sài Gòn</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="admin-body">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-header">
+      <img src="/assets/logo/logo.svg" alt="CSG" />
+      <span>CSG Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active" data-section="general"><i class="fas fa-cog"></i> Tổng quan</button>
+      <button class="sidebar-link" data-section="projects"><i class="fas fa-folder-open"></i> Dự án</button>
+      <button class="sidebar-link" data-section="departments"><i class="fas fa-sitemap"></i> Các Ban</button>
+      <button class="sidebar-link" data-section="halloffame"><i class="fas fa-star"></i> Vinh danh</button>
+      <button class="sidebar-link" data-section="members"><i class="fas fa-users"></i> Thành viên</button>
+      <button class="sidebar-link" data-section="achievements"><i class="fas fa-trophy"></i> Ấn tượng</button>
+      <button class="sidebar-link" data-section="sponsors"><i class="fas fa-handshake"></i> Nhà tài trợ</button>
+      <button class="sidebar-link" data-section="about"><i class="fas fa-info-circle"></i> Về Cóc</button>
+      <button class="sidebar-link" data-section="footer"><i class="fas fa-shoe-prints"></i> Footer</button>
+      <button class="sidebar-link" data-section="home"><i class="fas fa-home"></i> Trang chủ</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="btn-export" class="sidebar-action"><i class="fas fa-download"></i> Export JSON</button>
+      <button id="btn-import" class="sidebar-action"><i class="fas fa-upload"></i> Import JSON</button>
+      <button id="btn-reset" class="sidebar-action danger"><i class="fas fa-undo"></i> Reset mặc định</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" />
+    </div>
+  </aside>
+
+  <!-- Mobile toggle -->
+  <button class="admin-menu-toggle" id="admin-menu-toggle"><i class="fas fa-bars"></i></button>
+
+  <!-- Main content -->
+  <main class="admin-main" id="admin-main">
+    <div class="admin-topbar">
+      <h1 id="admin-page-title">Tổng quan</h1>
+      <div class="admin-actions">
+        <button id="btn-save" class="btn-primary"><i class="fas fa-save"></i> Lưu thay đổi</button>
+        <a href="/" target="_blank" class="btn-secondary"><i class="fas fa-external-link-alt"></i> Xem trang</a>
+      </div>
+    </div>
+
+    <div class="admin-content" id="admin-content">
+      <!-- Dynamic content rendered by admin.js -->
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="admin-toast"></div>
+
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>
