@@ -104,39 +104,86 @@ function renderSection(section) {
     case 'achievements': content.innerHTML = renderAchievements(); break;
     case 'sponsors': content.innerHTML = renderSponsors(); break;
     case 'about': content.innerHTML = renderAbout(); break;
-    case 'footer': content.innerHTML = renderFooter(); break;
-    case 'home': content.innerHTML = renderHome(); break;
     default: content.innerHTML = '<p>Section not found</p>';
   }
   bindSectionEvents(section);
 }
 
-// ===== GENERAL =====
+// ===== GENERAL & FOOTER =====
 function renderGeneral() {
   const g = siteData.general;
+  const f = siteData.footer || {};
+  const h = siteData.home;
+
+  const banners = (h.hero.banners || []).map((b, i) => `
+    <div class="admin-item">
+      <img src="${b.bgImage}" alt="Banner" class="admin-item-thumb" />
+      <div class="admin-item-info">
+        <div class="admin-item-title" style="font-size:0.85rem;">Banner ${i + 1}</div>
+        <div class="admin-item-sub" style="font-size:0.75rem;">${esc(b.link)}</div>
+      </div>
+      <div class="admin-item-actions">
+        <button class="btn-icon" data-action="edit-banner" data-index="${i}"><i class="fas fa-pen"></i></button>
+        <button class="btn-icon danger" data-action="delete-banner" data-index="${i}"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+
+  const statItems = (h.stats?.items || []).map((s, i) => `
+    <div class="admin-item">
+      <div class="admin-item-info">
+        <div class="admin-item-title" style="font-size:0.85rem;">${s.number}${s.suffix} - ${esc(s.label)}</div>
+      </div>
+      <div class="admin-item-actions">
+        <button class="btn-icon" data-action="edit-stat" data-index="${i}"><i class="fas fa-pen"></i></button>
+        <button class="btn-icon danger" data-action="delete-stat" data-index="${i}"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+
+
   return `
     <div class="admin-card">
-      <div class="admin-card-header"><h3>Social Links</h3></div>
+      <div class="admin-card-header"><h3>Mạng xã hội (Socials)</h3></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Facebook</label>
-          <input type="text" value="${esc(g.socialLinks.facebook)}" data-bind="general.socialLinks.facebook" />
-        </div>
-        <div class="form-group">
-          <label>Instagram</label>
-          <input type="text" value="${esc(g.socialLinks.instagram)}" data-bind="general.socialLinks.instagram" />
-        </div>
+        <div class="form-group"><label>Facebook</label><input type="text" value="${esc(g.socialLinks.facebook)}" data-bind="general.socialLinks.facebook" /></div>
+        <div class="form-group"><label>Instagram</label><input type="text" value="${esc(g.socialLinks.instagram)}" data-bind="general.socialLinks.instagram" /></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>TikTok</label>
-          <input type="text" value="${esc(g.socialLinks.tiktok)}" data-bind="general.socialLinks.tiktok" />
-        </div>
-        <div class="form-group">
-          <label>YouTube</label>
-          <input type="text" value="${esc(g.socialLinks.youtube)}" data-bind="general.socialLinks.youtube" />
-        </div>
+        <div class="form-group"><label>TikTok</label><input type="text" value="${esc(g.socialLinks.tiktok)}" data-bind="general.socialLinks.tiktok" /></div>
+        <div class="form-group"><label>YouTube</label><input type="text" value="${esc(g.socialLinks.youtube)}" data-bind="general.socialLinks.youtube" /></div>
       </div>
+    </div>
+
+
+    <div class="admin-card" style="margin-top:24px;">
+      <div class="admin-card-header"><h3>Footer (Mô tả, Địa chỉ, Liên hệ)</h3></div>
+      <div class="form-group">
+        <label>Mô tả (About)</label>
+        <textarea data-bind="footer.description" style="min-height:80px;">${esc(f.description || '')}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Địa chỉ</label><input type="text" value="${esc(f.address || '')}" data-bind="footer.address" /></div>
+        <div class="form-group"><label>Email</label><input type="text" value="${esc(f.email || '')}" data-bind="footer.email" /></div>
+      </div>
+      <div class="form-group"><label>Số điện thoại</label><input type="text" value="${esc(f.phone || '')}" data-bind="footer.phone" /></div>
+    </div>
+
+
+    <div class="admin-card" style="margin-top:24px;">
+      <div class="admin-card-header">
+        <h3>Hero Banner Slider (${(h.hero.banners||[]).length})</h3>
+        <button class="btn-add" data-action="add-banner"><i class="fas fa-plus"></i> Thêm</button>
+      </div>
+      <div class="admin-item-list">${banners}</div>
+    </div>
+    
+    <div class="admin-card" style="margin-top:24px;">
+      <div class="admin-card-header">
+        <h3>Số liệu (Home Stats - ${(h.stats?.items||[]).length})</h3>
+        <button class="btn-add" data-action="add-stat"><i class="fas fa-plus"></i> Thêm</button>
+      </div>
+      <div class="admin-item-list">${statItems}</div>
     </div>
   `;
 }
@@ -146,44 +193,25 @@ function renderProjects() {
   const realProjects = siteData.projects.filter(p => p.year !== 'Chuyên mục');
   const items = realProjects.map((p) => {
     const idx = siteData.projects.indexOf(p);
-    const milestones = (p.milestones || []).map((m, mi) => `
-      <div class="admin-item" style="padding:4px 8px;">
-        <div class="admin-item-info"><div class="admin-item-sub">${esc(m.label)}: <strong>${esc(m.date)}</strong></div></div>
-        <div class="admin-item-actions">
-          <button class="btn-icon" data-action="edit-milestone" data-index="${idx}" data-year="${mi}"><i class="fas fa-pen"></i></button>
-          <button class="btn-icon danger" data-action="delete-milestone" data-index="${idx}" data-year="${mi}"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-    `).join('');
-    const links = (p.links || (p.link ? [{url: p.link, label: 'Liên kết dự án'}] : [])).map((l, li) => `
-      <div class="admin-item" style="padding:4px 8px;">
-        <div class="admin-item-info"><div class="admin-item-sub"><a href="${l.url}" target="_blank" style="color:var(--gold-primary);">${esc(l.label || l.url)}</a></div></div>
-        <div class="admin-item-actions">
-          <button class="btn-icon" data-action="edit-link" data-index="${idx}" data-year="${li}"><i class="fas fa-pen"></i></button>
-          <button class="btn-icon danger" data-action="delete-link" data-index="${idx}" data-year="${li}"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-    `).join('');
+    const tags = [];
+    if (p.featured) tags.push('<span style="background:#FFDE21;color:#000;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold;margin-right:8px;line-height:1;"><i class="fas fa-star" style="font-size:0.6rem;margin-right:4px;"></i>NỔI BẬT</span>');
+    if (p.ongoing) tags.push('<span style="background:#00D13B;color:#000;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold;line-height:1;"><i class="fas fa-circle" style="font-size:0.5rem;margin-right:4px;"></i>ĐANG DIỄN RA</span>');
+    
     return `
-    <div class="admin-card">
-      <div class="admin-card-header">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <img src="${p.image}" style="width:48px;height:60px;object-fit:cover;border-radius:6px;" />
-          <div><div class="admin-item-title">${esc(p.title)}</div><div class="admin-item-sub">${p.year} • ${p.category}${p.featured ? ' ⭐' : ''}${p.ongoing ? ' 🟢 Đang diễn ra' : ''}</div></div>
+    <div class="admin-card" style="padding:16px;">
+      <div class="admin-card-header" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <img src="${p.image}" style="width:60px;height:75px;object-fit:cover;border-radius:8px;" />
+          <div>
+            <div class="admin-item-title" style="font-size:1.1rem;margin-bottom:4px;display:flex;align-items:center;">
+              <span style="margin-right:8px;">${esc(p.title)}</span> ${tags.join('')}
+            </div>
+            <div class="admin-item-sub">${p.year} • ${p.category}</div>
+          </div>
         </div>
-        <div>
-          <button class="btn-add" data-action="edit-project" data-index="${idx}"><i class="fas fa-pen"></i> Sửa</button>
+        <div class="admin-item-actions">
+          <button class="btn-primary" data-action="edit-project" data-index="${idx}"><i class="fas fa-edit"></i> Quản lý Dự án</button>
           <button class="btn-icon danger" data-action="delete-project" data-index="${idx}"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-      <div style="padding:0 16px 12px;display:flex;gap:24px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:250px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><strong style="font-size:0.8rem;color:var(--text-secondary);">Mốc thời gian (${(p.milestones||[]).length})</strong><button class="btn-add" data-action="add-milestone" data-index="${idx}" style="padding:2px 8px;font-size:0.75rem;"><i class="fas fa-plus"></i></button></div>
-          <div class="admin-item-list" style="border:1px solid var(--border-color);border-radius:6px;">${milestones || '<p style="padding:8px;color:var(--text-muted);font-size:0.8rem;">Chưa có</p>'}</div>
-        </div>
-        <div style="flex:1;min-width:250px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><strong style="font-size:0.8rem;color:var(--text-secondary);">Liên kết (${(p.links||[]).length || (p.link ? 1 : 0)})</strong><button class="btn-add" data-action="add-link" data-index="${idx}" style="padding:2px 8px;font-size:0.75rem;"><i class="fas fa-plus"></i></button></div>
-          <div class="admin-item-list" style="border:1px solid var(--border-color);border-radius:6px;">${links || '<p style="padding:8px;color:var(--text-muted);font-size:0.8rem;">Chưa có</p>'}</div>
         </div>
       </div>
     </div>`;
@@ -231,50 +259,31 @@ function renderCategories() {
 // ===== DEPARTMENTS =====
 function renderDepartments() {
   const deptCards = siteData.departments.map((d, di) => {
-    const teamsHtml = (d.teams || []).map((t, ti) => {
-      const membersHtml = (t.members || []).map((m, mi) => `
-        <div class="admin-item" style="padding:2px 8px;">
-          <div class="admin-item-info"><div class="admin-item-sub">${esc(m.name)} - <em>${esc(m.role)}</em></div></div>
-          <div class="admin-item-actions">
-            <button class="btn-icon" data-action="edit-team-member" data-index="${di}" data-year="${ti}" data-cat="${mi}"><i class="fas fa-pen"></i></button>
-            <button class="btn-icon danger" data-action="delete-team-member" data-index="${di}" data-year="${ti}" data-cat="${mi}"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-      `).join('');
-      return `
-      <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-color);border-radius:8px;padding:12px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:10px;"><img src="${t.image}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;" /><strong>${esc(t.name)}</strong></div>
-          <div>
-            <button class="btn-icon" data-action="edit-team" data-index="${di}" data-year="${ti}"><i class="fas fa-pen"></i></button>
-            <button class="btn-icon" data-action="add-team-member" data-index="${di}" data-year="${ti}"><i class="fas fa-user-plus"></i></button>
-            <button class="btn-icon danger" data-action="delete-team" data-index="${di}" data-year="${ti}"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-        <div class="admin-item-list">${membersHtml || '<p style="padding:4px;color:var(--text-muted);font-size:0.8rem;">Chưa có thành viên</p>'}</div>
-      </div>`;
-    }).join('');
-
     return `
-      <div class="admin-card">
-        <div class="admin-card-header">
+      <div class="admin-card" style="padding:16px;">
+        <div class="admin-card-header" style="margin-bottom:0;">
           <div style="display:flex;align-items:center;gap:12px;">
-            ${d.image ? `<img src="${d.image}" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" />` : ''}
-            <h3>${esc(d.name)}</h3>
+            ${d.image ? `<img src="${d.image}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;" />` : ''}
+            <div>
+              <div class="admin-item-title" style="font-size:1.1rem;margin-bottom:4px;">${esc(d.name)}</div>
+              <div class="admin-item-sub">ID: ${d.id} • ${(d.teams || []).length} teams</div>
+            </div>
           </div>
-          <div>
-            <button class="btn-add" data-action="edit-dept" data-index="${di}"><i class="fas fa-pen"></i> Sửa</button>
-            <button class="btn-add" data-action="add-team" data-index="${di}"><i class="fas fa-plus"></i> Thêm team</button>
-            <button class="btn-icon danger" data-action="delete-dept" data-index="${di}" style="margin-left:8px;"><i class="fas fa-trash"></i></button>
+          <div class="admin-item-actions">
+            <button class="btn-primary" data-action="edit-dept" data-index="${di}"><i class="fas fa-edit"></i> Quản lý Ban & Team</button>
+            <button class="btn-icon danger" data-action="delete-dept" data-index="${di}"><i class="fas fa-trash"></i></button>
           </div>
         </div>
-        <div style="padding:0 16px 16px;">${teamsHtml || '<p style="color:var(--text-muted);">Chưa có team</p>'}</div>
       </div>
     `;
   }).join('');
+
   return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3>Phòng Ban / Hội đồng (${siteData.departments.length})</h3>
+      <button class="btn-add" data-action="add-dept"><i class="fas fa-plus"></i> Thêm ban mới</button>
+    </div>
     ${deptCards}
-    <button class="btn-add" data-action="add-dept" style="width:100%;justify-content:center;padding:12px;"><i class="fas fa-plus"></i> Thêm Ban mới</button>
   `;
 }
 
@@ -295,35 +304,43 @@ function renderMembers() {
     </div>
   `).join('');
 
-  // Board generations
-  const generations = siteData.boardGenerations.map((gen, gi) => {
-    const memberItems = gen.members.map((m, mi) => `
-      <div class="admin-item">
-        <img src="${m.photo}" alt="${esc(m.name)}" class="admin-item-thumb" />
-        <div class="admin-item-info">
-          <div class="admin-item-title">${esc(m.name)}</div>
-          <div class="admin-item-sub">${esc(m.role)} • ${esc(m.gen)}</div>
-        </div>
-        <div class="admin-item-actions">
-          <button class="btn-icon" data-action="edit-board-member" data-year="${gi}" data-index="${mi}"><i class="fas fa-pen"></i></button>
-          <button class="btn-icon danger" data-action="delete-board-member" data-year="${gi}" data-index="${mi}"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>
-    `).join('');
+  // Current Board
+  if (!siteData.boardGenerations || siteData.boardGenerations.length === 0) {
+    siteData.boardGenerations = [{ term: 'Hiện tại', members: [] }];
+  }
+  const currentGen = siteData.boardGenerations[0];
+  
+  // Group members by level
+  const membersByLevel = {};
+  (currentGen.members || []).forEach(m => {
+    const lv = m.level || 1;
+    if (!membersByLevel[lv]) membersByLevel[lv] = [];
+    membersByLevel[lv].push(m);
+  });
 
-    return `
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3>Ban chủ nhiệm: ${gen.term} (${gen.members.length})</h3>
-          <div>
-            <button class="btn-add" data-action="edit-board-gen" data-year="${gi}"><i class="fas fa-pen"></i> Sửa nhiệm kỳ</button>
-            <button class="btn-add" data-action="add-board-member" data-year="${gi}"><i class="fas fa-plus"></i> Thêm TV</button>
+  let groupedHtml = '';
+  // Sort levels descending (5 down to 1)
+  [5, 4, 3, 2, 1].forEach(lv => {
+    if (!membersByLevel[lv]) return;
+    const listHtml = membersByLevel[lv].map((m, mi) => {
+      const realIdx = currentGen.members.indexOf(m);
+      return `
+      <div class="admin-item" style="padding:10px 16px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="${m.photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+          <div class="admin-item-info">
+            <div class="admin-item-title" style="font-weight:600;">${esc(m.name)}</div>
+            <div class="admin-item-sub">Level ${lv} • ${esc(m.role)}</div>
           </div>
         </div>
-        <div class="admin-item-list">${memberItems}</div>
-      </div>
-    `;
-  }).join('');
+        <div class="admin-item-actions">
+          <button class="btn-icon" data-action="edit-board-member" data-index="${realIdx}"><i class="fas fa-pen"></i></button>
+          <button class="btn-icon danger" data-action="delete-board-member" data-index="${realIdx}"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+    groupedHtml += `<div style="padding:8px 16px;background:rgba(255,222,33,0.05);color:var(--text-gold);font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;border-top:1px solid #222;">Cấp độ ${lv}</div>${listHtml}`;
+  });
 
   return `
     <div class="admin-card">
@@ -333,12 +350,18 @@ function renderMembers() {
       </div>
       <div class="admin-item-list">${presidents}</div>
     </div>
-    ${generations}
-    <button class="btn-add" data-action="add-board-gen" style="width:100%;justify-content:center;padding:12px;"><i class="fas fa-plus"></i> Thêm nhiệm kỳ mới</button>
+    
+    <div class="admin-card" style="margin-top:32px;">
+      <div class="admin-card-header">
+        <h3 style="color:var(--text-gold);">Ban chủ nhiệm hiện tại (${currentGen.members.length})</h3>
+        <button class="btn-add" data-action="add-board-member"><i class="fas fa-plus"></i> Thêm Thành viên</button>
+      </div>
+      <div class="admin-item-list" style="border-top:1px solid #333;">${groupedHtml || '<p style="padding:16px;color:#666;">Chưa có thành viên nào</p>'}</div>
+    </div>
   `;
 }
 
-// ===== ACHIEVEMENTS =====
+// ===== ACHIEVEMENTS & SPONSORS =====
 function renderAchievements() {
   const awards = siteData.awards.map((a, i) => `
     <div class="admin-item">
@@ -383,6 +406,20 @@ function renderAchievements() {
     </div>
   `).join('');
 
+  // Sponsors
+  const sponsors = (siteData.sponsors || []).map((s, i) => `
+    <div class="admin-item">
+      <img src="${s.logo}" alt="${esc(s.name)}" class="admin-item-thumb" />
+      <div class="admin-item-info">
+        <div class="admin-item-title">${esc(s.name)}</div>
+      </div>
+      <div class="admin-item-actions">
+        <button class="btn-icon" data-action="edit-sponsor" data-index="${i}"><i class="fas fa-pen"></i></button>
+        <button class="btn-icon danger" data-action="delete-sponsor" data-index="${i}"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+
   return `
     <div class="admin-card">
       <div class="admin-card-header">
@@ -402,10 +439,17 @@ function renderAchievements() {
     </div>
     <div class="admin-card">
       <div class="admin-card-header">
-        <h3>Đã hợp tác cùng (${(siteData.collaborators||[]).length})</h3>
+        <h3>Đối tác / Hợp tác cùng (${(siteData.collaborators||[]).length})</h3>
         <button class="btn-add" data-action="add-collaborator"><i class="fas fa-plus"></i> Thêm</button>
       </div>
       <div class="admin-item-list">${collabs}</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <h3>Nhà tài trợ (${(siteData.sponsors||[]).length})</h3>
+        <button class="btn-add" data-action="add-sponsor"><i class="fas fa-plus"></i> Thêm</button>
+      </div>
+      <div class="admin-item-list">${sponsors}</div>
     </div>
   `;
 }
@@ -496,171 +540,77 @@ function renderAbout() {
   `;
 }
 
-// ===== FOOTER =====
-function renderFooter() {
-  const f = siteData.footer;
-  return `
-    <div class="admin-card">
-      <div class="admin-card-header"><h3>Thông tin chung</h3></div>
-      <div class="form-group">
-        <label>Mô tả</label>
-        <textarea data-bind="footer.description">${esc(f.description)}</textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Địa chỉ</label>
-          <input type="text" value="${esc(f.address || '')}" data-bind="footer.address" />
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="text" value="${esc(f.email || '')}" data-bind="footer.email" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Số điện thoại</label>
-        <input type="text" value="${esc(f.phone || '')}" data-bind="footer.phone" />
-      </div>
-    </div>
-  `;
-}
-
-function renderFooterList(title, key, items) {
-  const list = items.map((item, i) => `
-    <div class="admin-item">
-      <div class="admin-item-info">
-        <div class="admin-item-title">${esc(item.name)}</div>
-        <div class="admin-item-sub">${esc(item.email || '')} • ${esc(item.phone || '')}</div>
-      </div>
-      <div class="admin-item-actions">
-        <button class="btn-icon" data-action="edit-footer-item" data-key="${key}" data-index="${i}"><i class="fas fa-pen"></i></button>
-        <button class="btn-icon danger" data-action="delete-footer-item" data-key="${key}" data-index="${i}"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>${title} (${items.length})</h3>
-        <button class="btn-add" data-action="add-footer-item" data-key="${key}"><i class="fas fa-plus"></i> Thêm</button>
-      </div>
-      <div class="admin-item-list">${list}</div>
-    </div>
-  `;
-}
-
-// ===== HOME =====
-function renderHome() {
-  const h = siteData.home;
-
-  // Banners list
-  const banners = (h.hero.banners || []).map((b, i) => `
-    <div class="admin-item">
-      <img src="${b.bgImage}" alt="Banner" class="admin-item-thumb" />
-      <div class="admin-item-info">
-        <div class="admin-item-title">Banner ${i + 1}</div>
-        <div class="admin-item-sub">${esc(b.link)}</div>
-      </div>
-      <div class="admin-item-actions">
-        <button class="btn-icon" data-action="edit-banner" data-index="${i}"><i class="fas fa-pen"></i></button>
-        <button class="btn-icon danger" data-action="delete-banner" data-index="${i}"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-
-  const statItems = (h.stats?.items || []).map((s, i) => `
-    <div class="admin-item">
-      <div class="admin-item-info">
-        <div class="admin-item-title">${s.number}${s.suffix} - ${esc(s.label)}</div>
-      </div>
-      <div class="admin-item-actions">
-        <button class="btn-icon" data-action="edit-stat" data-index="${i}"><i class="fas fa-pen"></i></button>
-        <button class="btn-icon danger" data-action="delete-stat" data-index="${i}"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Hero Banner Slider (${(h.hero.banners||[]).length})</h3>
-        <button class="btn-add" data-action="add-banner"><i class="fas fa-plus"></i> Thêm banner</button>
-      </div>
-      <div class="admin-item-list">${banners}</div>
-    </div>
-    <div class="admin-card">
-      <div class="admin-card-header">
-        <h3>Số liệu (${(h.stats?.items||[]).length})</h3>
-        <button class="btn-add" data-action="add-stat"><i class="fas fa-plus"></i> Thêm</button>
-      </div>
-      <div class="admin-item-list">${statItems}</div>
-    </div>
-  `;
-}
-
 // ===== HALL OF FAME =====
 function renderHallOfFame() {
   const hof = siteData.hallOfFame || { individuals: { yearly: [], semesters: [] }, collectives: { yearly: [], semesters: [] } };
 
-  function renderHofSection(type, label) {
-    const section = hof[type] || { yearly: [], semesters: [] };
-    
-    // Yearly
-    const yearlyCards = (section.yearly || []).map((yr, yi) => {
-      const cats = (yr.categories || []).map((cat, ci) => {
-        const members = (cat.members || []).map((m, mi) => `
-          <div class="admin-item">
-            <img src="${m.image}" class="admin-item-thumb" />
-            <div class="admin-item-info"><div class="admin-item-title">${esc(m.recipient)}</div></div>
-            <div class="admin-item-actions">
-              <button class="btn-icon" data-action="edit-hof-member" data-type="${type}" data-period="yearly" data-year="${yi}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-pen"></i></button>
-              <button class="btn-icon danger" data-action="delete-hof-member" data-type="${type}" data-period="yearly" data-year="${yi}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-trash"></i></button>
+  function renderHofTable(type, period, periodKey, label) {
+    const data = hof[type][period] || [];
+    if (data.length === 0) return '';
+
+    return data.map((item, index) => {
+      const periodTitle = item.year || item.semester;
+      const categoriesHtml = (item.categories || []).map((cat, ci) => {
+        const membersRows = (cat.members || []).map((m, mi) => `
+          <tr>
+            <td style="color:var(--text-gold);font-weight:700;width:200px;">${esc(cat.name)}</td>
+            <td>${esc(m.recipient)}</td>
+            <td style="width:60px;"><img src="${m.image}" alt=""></td>
+            <td style="text-align:right;width:120px;">
+              <button class="btn-icon" data-action="edit-hof-member" data-type="${type}" data-period="${period}" data-year="${index}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-pen"></i></button>
+              <button class="btn-icon danger" data-action="delete-hof-member" data-type="${type}" data-period="${period}" data-year="${index}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `).join('');
+
+        return `
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+               <div style="display:flex;align-items:center;gap:8px;">
+                 <strong style="color:#fff;font-size:0.95rem;">Danh hiệu: ${esc(cat.name)}</strong>
+                 <button class="btn-icon" data-action="edit-hof-cat" data-type="${type}" data-period="${period}" data-year="${index}" data-cat="${ci}"><i class="fas fa-pen" style="font-size:0.7rem;"></i></button>
+                 <button class="btn-icon danger" data-action="delete-hof-cat" data-type="${type}" data-period="${period}" data-year="${index}" data-cat="${ci}"><i class="fas fa-trash" style="font-size:0.7rem;"></i></button>
+               </div>
+               <button class="btn-add" data-action="add-hof-member" data-type="${type}" data-period="${period}" data-year="${index}" data-cat="${ci}" style="font-size:0.7rem;padding:4px 10px;"><i class="fas fa-plus"></i> Thêm người nhận</button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <tbody>
+                  ${membersRows || '<tr><td colspan="4" style="text-align:center;padding:20px;color:#666;">Chưa có người nhận nào</td></tr>'}
+                </tbody>
+              </table>
             </div>
           </div>
-        `).join('');
-        return `<div style="margin-bottom:16px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><strong style="color:var(--text-gold);font-size:0.85rem;">${esc(cat.name)}</strong><button class="btn-icon" data-action="edit-hof-cat" data-type="${type}" data-period="yearly" data-year="${yi}" data-cat="${ci}" style="padding:2px;"><i class="fas fa-pen" style="font-size:0.65rem;"></i></button><button class="btn-icon danger" data-action="delete-hof-cat" data-type="${type}" data-period="yearly" data-year="${yi}" data-cat="${ci}" style="padding:2px;"><i class="fas fa-trash" style="font-size:0.65rem;"></i></button></div><div class="admin-item-list">${members}</div><button class="btn-add" data-action="add-hof-member" data-type="${type}" data-period="yearly" data-year="${yi}" data-cat="${ci}" style="margin-top:4px;"><i class="fas fa-plus"></i> Thêm</button></div>`;
+        `;
       }).join('');
-      return `
-        <div class="admin-card">
-          <div class="admin-card-header"><h3>${label} - Năm ${esc(yr.year)}</h3>
-            <button class="btn-add" data-action="add-hof-cat" data-type="${type}" data-period="yearly" data-year="${yi}"><i class="fas fa-plus"></i> Thêm danh hiệu</button></div>
-          ${cats}
-        </div>`;
-    }).join('');
 
-    // Semesters
-    const semCards = (section.semesters || []).map((sem, si) => {
-      const cats = (sem.categories || []).map((cat, ci) => {
-        const members = (cat.members || []).map((m, mi) => `
-          <div class="admin-item">
-            <img src="${m.image}" class="admin-item-thumb" />
-            <div class="admin-item-info"><div class="admin-item-title">${esc(m.recipient)}</div></div>
-            <div class="admin-item-actions">
-              <button class="btn-icon" data-action="edit-hof-member" data-type="${type}" data-period="semesters" data-year="${si}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-pen"></i></button>
-              <button class="btn-icon danger" data-action="delete-hof-member" data-type="${type}" data-period="semesters" data-year="${si}" data-cat="${ci}" data-index="${mi}"><i class="fas fa-trash"></i></button>
-            </div>
+      return `
+        <div class="admin-card" style="margin-bottom:32px;">
+          <div class="admin-card-header">
+            <h3>${label} - ${esc(periodTitle)}</h3>
+            <button class="btn-add" data-action="add-hof-cat" data-type="${type}" data-period="${period}" data-year="${index}"><i class="fas fa-plus"></i> Thêm danh hiệu</button>
           </div>
-        `).join('');
-        return `<div style="margin-bottom:16px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><strong style="color:var(--text-gold);font-size:0.85rem;">${esc(cat.name)}</strong><button class="btn-icon" data-action="edit-hof-cat" data-type="${type}" data-period="semesters" data-year="${si}" data-cat="${ci}" style="padding:2px;"><i class="fas fa-pen" style="font-size:0.65rem;"></i></button><button class="btn-icon danger" data-action="delete-hof-cat" data-type="${type}" data-period="semesters" data-year="${si}" data-cat="${ci}" style="padding:2px;"><i class="fas fa-trash" style="font-size:0.65rem;"></i></button></div><div class="admin-item-list">${members}</div><button class="btn-add" data-action="add-hof-member" data-type="${type}" data-period="semesters" data-year="${si}" data-cat="${ci}" style="margin-top:4px;"><i class="fas fa-plus"></i> Thêm</button></div>`;
-      }).join('');
-      return `
-        <div class="admin-card">
-          <div class="admin-card-header"><h3>${label} - ${esc(sem.semester)}</h3>
-            <button class="btn-add" data-action="add-hof-cat" data-type="${type}" data-period="semesters" data-year="${si}"><i class="fas fa-plus"></i> Thêm danh hiệu</button></div>
-          ${cats}
-        </div>`;
+          <div style="padding:16px;">
+            ${categoriesHtml || '<p style="color:#666;text-align:center;">Chưa có danh hiệu nào</p>'}
+          </div>
+        </div>
+      `;
     }).join('');
-
-    return `
-      <h2 style="color:var(--text-primary);font-size:1.2rem;margin:24px 0 12px;text-transform:uppercase;letter-spacing:1px;">${label}</h2>
-      ${yearlyCards}
-      <button class="btn-add" data-action="add-hof-year" data-type="${type}" style="width:100%;justify-content:center;padding:8px;margin-bottom:16px;"><i class="fas fa-plus"></i> Thêm năm mới (${label})</button>
-      ${semCards}
-      <button class="btn-add" data-action="add-hof-sem" data-type="${type}" style="width:100%;justify-content:center;padding:8px;margin-bottom:24px;"><i class="fas fa-plus"></i> Thêm học kỳ mới (${label})</button>
-    `;
   }
 
-  return renderHofSection('individuals', 'Cá nhân') + renderHofSection('collectives', 'Tập thể');
+  return `
+    <h2 style="color:var(--text-gold);margin:32px 0 16px;border-bottom:1px solid #333;padding-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Cá nhân Vinh danh</h2>
+    ${renderHofTable('individuals', 'yearly', 'year', 'Vinh danh Năm')}
+    <button class="btn-add" data-action="add-hof-year" data-type="individuals" style="width:100%;justify-content:center;padding:12px;margin-bottom:20px;"><i class="fas fa-plus"></i> THÊM VINH DANH NĂM MỚI (CÁ NHÂN)</button>
+    ${renderHofTable('individuals', 'semesters', 'semester', 'Vinh danh Học kỳ')}
+    <button class="btn-add" data-action="add-hof-sem" data-type="individuals" style="width:100%;justify-content:center;padding:12px;margin-bottom:40px;"><i class="fas fa-plus"></i> THÊM VINH DANH HỌC KỲ MỚI (CÁ NHÂN)</button>
+
+    <h2 style="color:var(--text-gold);margin:48px 0 16px;border-bottom:1px solid #333;padding-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Tập thể Vinh danh</h2>
+    ${renderHofTable('collectives', 'yearly', 'year', 'Vinh danh Năm')}
+    <button class="btn-add" data-action="add-hof-year" data-type="collectives" style="width:100%;justify-content:center;padding:12px;margin-bottom:20px;"><i class="fas fa-plus"></i> THÊM VINH DANH NĂM MỚI (TẬP THỂ)</button>
+    ${renderHofTable('collectives', 'semesters', 'semester', 'Vinh danh Học kỳ')}
+    <button class="btn-add" data-action="add-hof-sem" data-type="collectives" style="width:100%;justify-content:center;padding:12px;margin-bottom:40px;"><i class="fas fa-plus"></i> THÊM VINH DANH HỌC KỲ MỚI (TẬP THỂ)</button>
+  `;
 }
 
 // ===== Bind Events =====
@@ -693,15 +643,15 @@ function handleAction(dataset) {
 
   switch (action) {
     // Projects
-    case 'add-project': showProjectModal(); break;
-    case 'edit-project': showProjectModal(i); break;
+    case 'add-project': showProjectAdvancedModal(); break;
+    case 'edit-project': showProjectAdvancedModal(i); break;
     case 'delete-project':
       if (confirm('Xóa dự án này?')) { siteData.projects.splice(i, 1); renderSection('projects'); }
       break;
 
     // Departments
-    case 'add-dept': showDeptModal(); break;
-    case 'edit-dept': showDeptModal(i); break;
+    case 'add-dept': showDeptAdvancedModal(); break;
+    case 'edit-dept': showDeptAdvancedModal(i); break;
     case 'delete-dept':
       if (confirm('Xóa ban này?')) { siteData.departments.splice(i, 1); renderSection('departments'); }
       break;
@@ -760,12 +710,12 @@ function handleAction(dataset) {
       break;
 
     // Board Members
-    case 'add-board-gen': showSimpleModal('Tên nhiệm kỳ (VD: Kỳ gần nhất)', '', (val) => { siteData.boardGenerations.unshift({ term: val, members: [] }); renderSection('members'); }); break;
-    case 'edit-board-gen': showSimpleModal('Sửa tên nhiệm kỳ', siteData.boardGenerations[yi].term, (val) => { siteData.boardGenerations[yi].term = val; renderSection('members'); }); break;
-    case 'add-board-member': showMemberModal(null, yi); break;
-    case 'edit-board-member': showMemberModal(i, yi); break;
+    case 'add-board-gen': showSimpleModal('Tên nhiệm kỳ (VD: Kỳ gần nhất)', '', (val) => { siteData.boardGenerations[0].term = val; renderSection('members'); }); break;
+    case 'edit-board-gen': showSimpleModal('Sửa tên nhiệm kỳ', siteData.boardGenerations[0].term, (val) => { siteData.boardGenerations[0].term = val; renderSection('members'); }); break;
+    case 'add-board-member': showMemberModal(null, 0); break;
+    case 'edit-board-member': showMemberModal(i, 0); break;
     case 'delete-board-member':
-      if (confirm('Xóa?')) { siteData.boardGenerations[yi].members.splice(i, 1); renderSection('members'); }
+      if (confirm('Xóa?')) { siteData.boardGenerations[0].members.splice(i, 1); renderSection('members'); }
       break;
 
     // Teams (Department)
@@ -844,6 +794,18 @@ function handleAction(dataset) {
     case 'delete-collaborator':
       if (confirm('Xóa?')) { siteData.collaborators.splice(i, 1); renderSection('achievements'); }
       break;
+
+    // Project Stats
+    case 'add-project-stat': showProjectStatModal(i); break;
+    case 'edit-project-stat': showProjectStatModal(i, yi); break;
+    case 'delete-project-stat': {
+      if (confirm('Xóa thông số này?')) {
+        const key = Object.keys(siteData.projects[i].stats)[yi];
+        delete siteData.projects[i].stats[key];
+        renderSection('projects');
+      }
+      break;
+    }
 
     // Category (Chuyên mục) - adds with year='Chuyên mục'
     case 'add-category': showCategoryModal(); break;
@@ -954,84 +916,358 @@ function showSimpleModal(title, value, onSave) {
   showModal(title, [{ key: 'value', label: 'Nội dung', value, type: 'text' }], (vals) => onSave(vals.value));
 }
 
-function showProjectModal(index) {
-  const p = index !== undefined ? siteData.projects[index] : {};
-  showModal(index !== undefined ? 'Sửa dự án' : 'Thêm dự án', [
-    { key: 'id', label: 'ID (slug)', value: p.id },
-    { key: 'title', label: 'Tên dự án', value: p.title },
-    { key: 'subtitle', label: 'Phụ đề', value: p.subtitle },
-    { key: 'year', label: 'Năm', value: p.year },
-    { key: 'category', label: 'Thể loại', value: p.category },
-    { key: 'image', label: 'Ảnh thẻ (URL)', value: p.image },
-    { key: 'banner', label: 'Banner rộng (URL, nếu khác ảnh thẻ)', value: p.banner },
-    { key: 'description', label: 'Mô tả', value: p.description, type: 'textarea' },
-    { key: 'featured', label: 'Nổi bật', value: p.featured, type: 'checkbox' },
-    { key: 'ongoing', label: 'Đang diễn ra', value: p.ongoing, type: 'checkbox' }
+function showProjectAdvancedModal(index) {
+  const p = index !== undefined ? siteData.projects[index] : {
+    id: 'new-project-' + Date.now(),
+    title: '',
+    subtitle: '',
+    year: String(new Date().getFullYear()),
+    category: 'event',
+    image: '',
+    banner: '',
+    description: '',
+    milestones: [],
+    links: [],
+    stats: {},
+    gallery: [],
+    featured: false,
+    ongoing: false
+  };
+
+  const overlay = document.createElement('div');
+  overlay.className = 'admin-modal-overlay';
+  
+  // Local copies for dynamic editing
+  let currentMilestones = [...(p.milestones || [])];
+  let currentLinks = [...(p.links || [])].map(l => typeof l === 'string' ? {label: 'Liên kết', url: l} : l);
+  let currentStats = {...(p.stats || {})};
+
+  const renderModalContent = () => {
+    const milestonesHtml = currentMilestones.map((m, i) => `
+      <div class="modal-list-item">
+        <input type="text" placeholder="Tên mốc" value="${esc(m.label)}" onchange="window._projModalUpdate('milestone', ${i}, 'label', this.value)" style="flex:1;">
+        <input type="text" placeholder="Thời gian" value="${esc(m.date)}" onchange="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
+        <button class="btn-icon danger" onclick="window._projModalDelete('milestone', ${i})"><i class="fas fa-trash"></i></button>
+      </div>
+    `).join('');
+
+    const linksHtml = currentLinks.map((l, i) => `
+      <div class="modal-list-item">
+        <input type="text" placeholder="Tên link" value="${esc(l.label || '')}" onchange="window._projModalUpdate('link', ${i}, 'label', this.value)" style="flex:1;">
+        <input type="text" placeholder="URL" value="${esc(l.url || '')}" onchange="window._projModalUpdate('link', ${i}, 'url', this.value)" style="flex:2;">
+        <button class="btn-icon danger" onclick="window._projModalDelete('link', ${i})"><i class="fas fa-trash"></i></button>
+      </div>
+    `).join('');
+
+    const statsEntries = Object.entries(currentStats);
+    const statsHtml = statsEntries.map(([k, v], i) => `
+      <div class="modal-list-item">
+        <input type="text" placeholder="Tên (Reach...)" value="${esc(k)}" onchange="window._projModalUpdateStat('key', ${i}, this.value)" style="flex:1;">
+        <input type="text" placeholder="Giá trị" value="${esc(v)}" onchange="window._projModalUpdateStat('val', ${i}, this.value)" style="flex:1;">
+        <button class="btn-icon danger" onclick="window._projModalDelete('stat', ${i})"><i class="fas fa-trash"></i></button>
+      </div>
+    `).join('');
+
+    overlay.innerHTML = `
+      <div class="admin-modal wide">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <h3 style="margin:0;">${index !== undefined ? 'Quản lý Dự án' : 'Thêm Dự án mới'}</h3>
+          <button class="btn-icon" id="m-close" style="font-size:1.5rem;">&times;</button>
+        </div>
+        
+        <div class="modal-split">
+          <div class="modal-basic-info">
+            <div class="form-row">
+              <div class="form-group"><label>ID (slug)</label><input type="text" id="m-id" value="${esc(p.id)}"></div>
+              <div class="form-group"><label>Thể loại</label><input type="text" id="m-cat" value="${esc(p.category)}"></div>
+            </div>
+            <div class="form-group"><label>Tên dự án</label><input type="text" id="m-title" value="${esc(p.title)}"></div>
+            <div class="form-group"><label>Phụ đề</label><input type="text" id="m-subtitle" value="${esc(p.subtitle)}"></div>
+            <div class="form-row">
+              <div class="form-group"><label>Năm</label><input type="text" id="m-year" value="${esc(p.year)}"></div>
+              <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:25px;white-space:nowrap;">
+                <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-feat" ${p.featured ? 'checked' : ''}> Nổi bật</label>
+                <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-ongoing" ${p.ongoing ? 'checked' : ''}> Đang diễn ra</label>
+              </div>
+            </div>
+            <div class="form-group"><label>Poster dự án (Thay ảnh thẻ URL)</label><input type="text" id="m-img" value="${esc(p.image)}"></div>
+            <div class="form-group"><label>Banner dự án (URL trống sẽ dùng Poster)</label><input type="text" id="m-banner" value="${esc(p.banner || '')}" placeholder="Bỏ trống nếu dùng Poster"></div>
+            <div class="form-group"><label>Mô tả</label><textarea id="m-desc" style="min-height:120px;">${esc(p.description)}</textarea></div>
+          </div>
+
+          <div class="modal-dynamic-lists">
+            <div class="modal-list-editor">
+              <div class="modal-list-title"><span>Mốc thời gian</span> <button class="btn-add" onclick="window._projModalAdd('milestone')" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-plus"></i> Thêm</button></div>
+              <div class="modal-list-items">${milestonesHtml || '<p style="color:#666;font-size:0.8rem;margin:0;">Chưa có mốc thời gian</p>'}</div>
+            </div>
+
+            <div class="modal-list-editor">
+              <div class="modal-list-title"><span>Liên kết dự án</span> <button class="btn-add" onclick="window._projModalAdd('link')" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-plus"></i> Thêm</button></div>
+              <div class="modal-list-items">${linksHtml || '<p style="color:#666;font-size:0.8rem;margin:0;">Chưa có liên kết</p>'}</div>
+            </div>
+
+            <div class="modal-list-editor">
+              <div class="modal-list-title"><span>Thành tích & Số liệu</span> <button class="btn-add" onclick="window._projModalAdd('stat')" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-plus"></i> Thêm</button></div>
+              <div class="modal-list-items">${statsHtml || '<p style="color:#666;font-size:0.8rem;margin:0;">Chưa có số liệu</p>'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" id="m-cancel">Hủy</button>
+          <button class="btn-primary" id="m-save" style="padding:12px 40px;font-size:1rem;"><i class="fas fa-save"></i> LƯU DỰ ÁN</button>
+        </div>
+      </div>
+    `;
+
+    overlay.querySelector('#m-cancel').onclick = () => { cleanup(); overlay.remove(); };
+    overlay.querySelector('#m-close').onclick = () => { cleanup(); overlay.remove(); };
+    overlay.querySelector('#m-save').onclick = () => {
+      const basic = {
+        id: overlay.querySelector('#m-id').value,
+        title: overlay.querySelector('#m-title').value,
+        subtitle: overlay.querySelector('#m-subtitle').value,
+        year: overlay.querySelector('#m-year').value,
+        category: overlay.querySelector('#m-cat').value,
+        image: overlay.querySelector('#m-img').value,
+        banner: overlay.querySelector('#m-banner').value,
+        description: overlay.querySelector('#m-desc').value,
+        featured: overlay.querySelector('#m-feat').checked,
+        ongoing: overlay.querySelector('#m-ongoing').checked
+      };
+
+      const updated = { ...p, ...basic, milestones: currentMilestones, links: currentLinks, stats: currentStats };
+      if (index !== undefined) { siteData.projects[index] = updated; } 
+      else { updated.gallery = updated.gallery || []; siteData.projects.push(updated); }
+      
+      cleanup();
+      overlay.remove();
+      renderSection('projects');
+      showToast('Đã cập nhật dự án thành công');
+    };
+  };
+
+  const cleanup = () => {
+    delete window._projModalAdd;
+    delete window._projModalUpdate;
+    delete window._projModalUpdateStat;
+    delete window._projModalDelete;
+  };
+
+  window._projModalAdd = (type) => {
+    if (type === 'milestone') currentMilestones.push({label:'', date:''});
+    if (type === 'link') currentLinks.push({label:'', url:''});
+    if (type === 'stat') currentStats['Mới'] = '';
+    renderModalContent();
+  };
+  window._projModalUpdate = (type, i, key, val) => {
+    if (type === 'milestone') currentMilestones[i][key] = val;
+    if (type === 'link') currentLinks[i][key] = val;
+  };
+  window._projModalUpdateStat = (updateType, i, val) => {
+    const entries = Object.entries(currentStats);
+    const [oldKey, oldVal] = entries[i];
+    if (updateType === 'key') {
+      delete currentStats[oldKey];
+      currentStats[val] = oldVal;
+    } else {
+      currentStats[oldKey] = val;
+    }
+  };
+  window._projModalDelete = (type, i) => {
+    if (type === 'milestone') currentMilestones.splice(i, 1);
+    if (type === 'link') currentLinks.splice(i, 1);
+    if (type === 'stat') delete currentStats[Object.keys(currentStats)[i]];
+    renderModalContent();
+  };
+
+  renderModalContent();
+  document.body.appendChild(overlay);
+}
+
+function showDeptAdvancedModal(index) {
+  const d = index !== undefined ? siteData.departments[index] : {
+    id: 'new-dept-' + Date.now(),
+    name: '',
+    image: '',
+    description: '',
+    subDepts: [],
+    teams: []
+  };
+
+  const overlay = document.createElement('div');
+  overlay.className = 'admin-modal-overlay';
+  
+  // Clone current dept for local editing
+  let currentDept = JSON.parse(JSON.stringify(d));
+
+  const renderModalContent = () => {
+    const teamsHtml = (currentDept.teams || []).map((t, ti) => {
+      const membersHtml = (t.members || []).map((m, mi) => `
+        <div class="modal-member-item">
+          <input type="text" placeholder="Tên" value="${esc(m.name)}" onchange="window._deptModalUpdateMember(${ti}, ${mi}, 'name', this.value)" style="flex:1;">
+          <input type="text" placeholder="Vai trò" value="${esc(m.role)}" onchange="window._deptModalUpdateMember(${ti}, ${mi}, 'role', this.value)" style="flex:1;">
+          <button class="btn-icon danger" onclick="window._deptModalDeleteMember(${ti}, ${mi})"><i class="fas fa-times"></i></button>
+        </div>
+      `).join('');
+
+      return `
+      <div class="modal-team-item">
+        <div class="modal-team-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <strong>Team:</strong> 
+            <input type="text" value="${esc(t.name)}" style="width:200px;background:#000;color:#fff;border:1px solid #333;border-radius:4px;padding:4px 8px;" onchange="window._deptModalUpdateTeam(${ti}, 'name', this.value)">
+          </div>
+          <button class="btn-icon danger" onclick="window._deptModalDeleteTeam(${ti})"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ảnh team (URL)</label><input type="text" value="${esc(t.image || '')}" onchange="window._deptModalUpdateTeam(${ti}, 'image', this.value)"></div>
+        </div>
+        <div class="form-group"><label>Mô tả team</label><textarea onchange="window._deptModalUpdateTeam(${ti}, 'description', this.value)">${esc(t.description || '')}</textarea></div>
+        <div style="margin-top:10px;">
+          <label style="font-size:0.75rem;color:#999;font-weight:700;margin-bottom:8px;display:block;">THÀNH VIÊN TEAM</label>
+          ${membersHtml || '<p style="color:#666;font-size:0.8rem;margin-bottom:8px;">Chưa có thành viên</p>'}
+          <button class="btn-add" onclick="window._deptModalAddMember(${ti})" style="font-size:0.7rem;padding:4px 8px;"><i class="fas fa-plus"></i> Thêm thành viên</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    overlay.innerHTML = `
+      <div class="admin-modal wide" style="max-width:1100px; display: block !important;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <h3 style="margin:0;">${index !== undefined ? 'Quản lý Ban: ' + currentDept.name : 'Thêm Ban mới'}</h3>
+          <button class="btn-icon" id="d-close" style="font-size:1.5rem;">&times;</button>
+        </div>
+        
+        <div class="modal-split" style="display:flex; gap:32px; width: 100%;">
+          <!-- Column 1: Basic Dept Info -->
+          <div class="modal-basic-info" style="flex:1;">
+            <div class="form-row">
+              <div class="form-group"><label>ID (Slug)</label><input type="text" id="d-id" value="${esc(currentDept.id)}"></div>
+              <div class="form-group" style="flex:2;"><label>Tên Ban</label><input type="text" id="d-name" value="${esc(currentDept.name)}"></div>
+            </div>
+            <div class="form-group">
+              <label>Ảnh Ban (URL)</label>
+              <input type="text" id="d-img" value="${esc(currentDept.image || '')}">
+            </div>
+            <div class="form-group">
+              <label>Mô tả Ban</label>
+              <textarea id="d-desc" style="min-height:300px;">${esc(currentDept.description || '')}</textarea>
+            </div>
+          </div>
+
+          <!-- Column 2: Teams Management -->
+          <div class="modal-dynamic-lists" style="flex:1.8; max-height:70vh; overflow-y:auto; padding-right:12px; border-left: 1px solid #333; padding-left: 20px;">
+            <div class="modal-list-title"><span>DANH SÁCH TEAMS TRONG BAN</span></div>
+            ${teamsHtml || '<p style="color:#666;margin-bottom:16px;">Phòng ban này chưa có team nào.</p>'}
+            <button class="btn-add" style="width:100%;justify-content:center;padding:12px;border-style:solid;" onclick="window._deptModalAddTeam()"><i class="fas fa-plus"></i> THÊM TEAM MỚI</button>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top:24px; padding-top:20px; border-top:1px solid #333; display:flex; justify-content:flex-end; gap:12px;">
+          <button class="btn-secondary" id="d-cancel">Hủy</button>
+          <button class="btn-primary" id="d-save" style="padding:12px 40px; font-size:1rem;"><i class="fas fa-save"></i> LƯU THÔNG TIN BAN</button>
+        </div>
+      </div>
+    `;
+
+    overlay.querySelector('#d-cancel').onclick = () => { cleanup(); overlay.remove(); };
+    overlay.querySelector('#d-close').onclick = () => { cleanup(); overlay.remove(); };
+    overlay.querySelector('#d-save').onclick = () => {
+      currentDept.id = overlay.querySelector('#d-id').value;
+      currentDept.name = overlay.querySelector('#d-name').value;
+      currentDept.image = overlay.querySelector('#d-img').value;
+      currentDept.description = overlay.querySelector('#d-desc').value;
+      currentDept.subDepts = []; // Removed redundant field
+
+      if (index !== undefined) {
+        siteData.departments[index] = currentDept;
+      } else {
+        siteData.departments.push(currentDept);
+      }
+      cleanup();
+      overlay.remove();
+      renderSection('departments');
+      showToast('Đã lưu thông tin ban thành công');
+    };
+  };
+
+  const cleanup = () => {
+    delete window._deptModalAddTeam;
+    delete window._deptModalDeleteTeam;
+    delete window._deptModalUpdateTeam;
+    delete window._deptModalAddMember;
+    delete window._deptModalUpdateMember;
+    delete window._deptModalDeleteMember;
+  };
+
+  // Helper bindings
+  window._deptModalAddTeam = () => {
+    if (!currentDept.teams) currentDept.teams = [];
+    currentDept.teams.push({ name: 'Team mới', image: '', description: '', members: [] });
+    renderModalContent();
+  };
+  window._deptModalDeleteTeam = (ti) => {
+    if (confirm('Xóa team này?')) {
+      currentDept.teams.splice(ti, 1);
+      renderModalContent();
+    }
+  };
+  window._deptModalUpdateTeam = (ti, key, val) => {
+    currentDept.teams[ti][key] = val;
+  };
+  window._deptModalAddMember = (ti) => {
+    if (!currentDept.teams[ti].members) currentDept.teams[ti].members = [];
+    currentDept.teams[ti].members.push({ name: '', role: '' });
+    renderModalContent();
+  };
+  window._deptModalUpdateMember = (ti, mi, key, val) => {
+    currentDept.teams[ti].members[mi][key] = val;
+  };
+  window._deptModalDeleteMember = (ti, mi) => {
+    currentDept.teams[ti].members.splice(mi, 1);
+    renderModalContent();
+  };
+
+  renderModalContent();
+  document.body.appendChild(overlay);
+}
+
+function showCategoryModal() {
+  showModal('Thêm chuyên mục', [
+    { key: 'id', label: 'ID (slug)', value: '' },
+    { key: 'title', label: 'Tên chuyên mục', value: '' },
+    { key: 'subtitle', label: 'Phụ đề', value: '' },
+    { key: 'image', label: 'Ảnh URL', value: '' },
+    { key: 'description', label: 'Mô tả', value: '', type: 'textarea' }
   ], (vals) => {
-    const project = {
-      ...p,
+    siteData.projects.push({
       id: vals.id || vals.title?.toLowerCase().replace(/\s+/g, '-') || 'new',
       title: vals.title || '',
       subtitle: vals.subtitle || '',
-      year: vals.year || String(new Date().getFullYear()),
-      category: vals.category || 'event',
+      year: 'Chuyên mục',
+      category: vals.id || 'category',
       image: vals.image || '',
-      banner: vals.banner || '',
       description: vals.description || '',
-      featured: vals.featured,
-      ongoing: vals.ongoing
-    };
-    if (index !== undefined) {
-      siteData.projects[index] = project;
-    } else {
-      project.milestones = [];
-      project.links = [];
-      project.stats = {};
-      project.gallery = [];
-      siteData.projects.push(project);
-    }
-    renderSection('projects');
+      stats: {},
+      gallery: [],
+      featured: false
+    });
+    renderSection('categories');
   });
 }
 
-function showDeptModal(index) {
-  const d = index !== undefined ? siteData.departments[index] : {};
-  showModal(index !== undefined ? 'Sửa Ban' : 'Thêm Ban', [
-    { key: 'id', label: 'ID', value: d.id },
-    { key: 'name', label: 'Tên Ban', value: d.name },
-    { key: 'image', label: 'Ảnh Ban (URL)', value: d.image },
-    { key: 'subDepts', label: 'Sub-departments (cách nhau bởi dấu phẩy)', value: (d.subDepts || []).join(', ') },
-    { key: 'description', label: 'Mô tả', value: d.description, type: 'textarea' }
-  ], (vals) => {
-    const dept = {
-      id: vals.id || vals.name?.toLowerCase().replace(/\s+/g, '-') || 'new',
-      name: vals.name || '',
-      image: vals.image || '',
-      subDepts: vals.subDepts ? vals.subDepts.split(',').map(s => s.trim()).filter(Boolean) : [],
-      description: vals.description || '',
-      teams: d.teams || []
-    };
-    if (index !== undefined) {
-      siteData.departments[index] = dept;
-    } else {
-      siteData.departments.push(dept);
-    }
-    renderSection('departments');
-  });
-}
+
 
 function showMemberModal(index, yearIndex) {
-  const m = index !== null ? siteData.boardGenerations[yearIndex].members[index] : {};
-
-  const fields = [
+  const m = index !== null ? siteData.boardGenerations[yearIndex].members[index] : { level: 1 };
+  showModal(index !== null ? 'Sửa thành viên' : 'Thêm thành viên', [
     { key: 'name', label: 'Họ tên', value: m.name },
     { key: 'role', label: 'Vai trò', value: m.role },
-    { key: 'gen', label: 'Gen/Khóa', value: m.gen },
+    { key: 'level', label: 'Cấp độ (1: Thành viên -> 5: Cao nhất)', value: m.level?.toString() || '1', type: 'number' },
     { key: 'photo', label: 'Ảnh URL', value: m.photo }
-  ];
-
-  showModal(index !== null ? 'Sửa thành viên' : 'Thêm thành viên', fields, (vals) => {
-    const member = { name: vals.name, role: vals.role, gen: vals.gen, photo: vals.photo };
+  ], (vals) => {
+    const member = { ...m, name: vals.name, role: vals.role, level: parseInt(vals.level) || 1, photo: vals.photo };
     if (index !== null) siteData.boardGenerations[yearIndex].members[index] = member;
     else siteData.boardGenerations[yearIndex].members.push(member);
     renderSection('members');
@@ -1092,98 +1328,6 @@ function showAboutBlockModal(index) {
       siteData.about.blocks.push(vals);
     }
     renderSection('about');
-  });
-}
-
-function showTeamModal(deptIndex, teamIndex) {
-  const dept = siteData.departments[deptIndex];
-  const t = teamIndex !== undefined ? dept.teams[teamIndex] : {};
-  showModal(teamIndex !== undefined ? 'Sửa team' : 'Thêm team mới', [
-    { key: 'name', label: 'Tên team', value: t.name },
-    { key: 'image', label: 'Ảnh URL', value: t.image },
-    { key: 'description', label: 'Mô tả', value: t.description, type: 'textarea' }
-  ], (vals) => {
-    const team = {
-      name: vals.name || '',
-      image: vals.image || '',
-      description: vals.description || '',
-      members: t.members || []
-    };
-    if (teamIndex !== undefined) {
-      dept.teams[teamIndex] = team;
-    } else {
-      if (!dept.teams) dept.teams = [];
-      dept.teams.push(team);
-    }
-    renderSection('departments');
-  });
-}
-
-function showCategoryModal() {
-  showModal('Thêm chuyên mục', [
-    { key: 'id', label: 'ID (slug)', value: '' },
-    { key: 'title', label: 'Tên chuyên mục', value: '' },
-    { key: 'subtitle', label: 'Phụ đề', value: '' },
-    { key: 'image', label: 'Ảnh URL', value: '' },
-    { key: 'description', label: 'Mô tả', value: '', type: 'textarea' }
-  ], (vals) => {
-    siteData.projects.push({
-      id: vals.id || vals.title?.toLowerCase().replace(/\s+/g, '-') || 'new',
-      title: vals.title || '',
-      subtitle: vals.subtitle || '',
-      year: 'Chuyên mục',
-      category: vals.id || 'category',
-      image: vals.image || '',
-      description: vals.description || '',
-      stats: {},
-      gallery: [],
-      featured: false
-    });
-    renderSection('categories');
-  });
-}
-
-function showMilestoneModal(projectIdx, milestoneIdx) {
-  const p = siteData.projects[projectIdx];
-  if (!p.milestones) p.milestones = [];
-  const m = milestoneIdx !== undefined ? p.milestones[milestoneIdx] : {};
-  showModal(milestoneIdx !== undefined ? 'Sửa mốc' : 'Thêm mốc thời gian', [
-    { key: 'label', label: 'Tên mốc (VD: Khai mạc)', value: m.label },
-    { key: 'date', label: 'Ngày (VD: 15/04/2024)', value: m.date }
-  ], (vals) => {
-    if (milestoneIdx !== undefined) { p.milestones[milestoneIdx] = vals; }
-    else { p.milestones.push(vals); }
-    renderSection('projects');
-  });
-}
-
-function showLinkModal(projectIdx, linkIdx) {
-  const p = siteData.projects[projectIdx];
-  // Migrate old single link to links array
-  if (!p.links && p.link) { p.links = [{url: p.link, label: 'Liên kết dự án'}]; delete p.link; }
-  if (!p.links) p.links = [];
-  const l = linkIdx !== undefined ? p.links[linkIdx] : {};
-  showModal(linkIdx !== undefined ? 'Sửa liên kết' : 'Thêm liên kết', [
-    { key: 'label', label: 'Tên hiển thị', value: l.label },
-    { key: 'url', label: 'URL', value: l.url }
-  ], (vals) => {
-    if (linkIdx !== undefined) { p.links[linkIdx] = vals; }
-    else { p.links.push(vals); }
-    renderSection('projects');
-  });
-}
-
-function showTeamMemberModal(deptIdx, teamIdx, memberIdx) {
-  const team = siteData.departments[deptIdx].teams[teamIdx];
-  if (!team.members) team.members = [];
-  const m = memberIdx !== undefined ? team.members[memberIdx] : {};
-  showModal(memberIdx !== undefined ? 'Sửa thành viên' : 'Thêm thành viên', [
-    { key: 'name', label: 'Họ tên', value: m.name },
-    { key: 'role', label: 'Vai trò', value: m.role }
-  ], (vals) => {
-    if (memberIdx !== undefined) { team.members[memberIdx] = vals; }
-    else { team.members.push(vals); }
-    renderSection('departments');
   });
 }
 

@@ -240,22 +240,27 @@
 
 .form-group input,
 .form-group textarea,
-.form-group select {
+.form-group select,
+.modal-list-item input,
+.modal-member-item input {
   width: 100%;
   padding: 10px 14px;
-  background: #0d0d0d;
-  border: 1px solid #2a2a2a;
+  background: #000 !important;
+  border: 1px solid #333;
   border-radius: 8px;
-  color: #fff;
+  color: #fff !important;
   font-size: 0.9rem;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
   font-family: inherit;
+  outline: none;
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
+.form-group textarea:focus,
+.modal-list-item input:focus,
+.modal-member-item input:focus {
   border-color: #FFDE21;
+  box-shadow: 0 0 0 1px rgba(255, 222, 33, 0.2);
 }
 
 .form-group textarea {
@@ -398,6 +403,77 @@
   margin-bottom: 24px;
 }
 
+.admin-modal.wide {
+  max-width: 1000px;
+}
+
+.modal-split {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 32px;
+}
+
+.modal-list-editor {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-list-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: #FFDE21;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modal-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-list-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modal-list-item input {
+  padding: 8px 12px !important;
+  font-size: 0.85rem !important;
+}
+
+.modal-team-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.modal-member-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.modal-team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #444;
+}
+
 .modal-actions {
   display: flex;
   gap: 8px;
@@ -437,7 +513,50 @@
   border-color: #dc3545;
 }
 
-/* Responsive */
+/* Table Styles for HOF */
+.admin-table-container {
+  overflow-x: auto;
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.admin-table th {
+  background: #111;
+  text-align: left;
+  padding: 12px 16px;
+  color: #FFDE21;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #222;
+}
+
+.admin-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #1a1a1a;
+  vertical-align: middle;
+}
+
+.admin-table tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.admin-table img {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
 @media (max-width: 768px) {
   .admin-sidebar {
     transform: translateX(-100%);

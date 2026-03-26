@@ -656,46 +656,26 @@ const DEFAULT_SITE_DATA = {
     { name: "Ngô Sỹ Bảo Duy", gen: "Chủ nhiệm đời thứ n", term: "2023 - 2024", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" }
   ],
 
-  // ===== MEMBERS (BAN CHỦ NHIỆM CÁC CẤP) =====
+  // ===== MEMBERS (BAN CHỦ NHIỆM) =====
   boardGenerations: [
     {
-      term: "Kỳ gần nhất",
+      term: "Nhiệm kỳ hiện tại",
       members: [
-        { name: "Ngô Sỹ Bảo Duy", role: "Chủ nhiệm CLB", gen: "GEN 19 | HK1 2024", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" },
-        { name: "Nguyễn Hoàng Đức Phương", role: "Trưởng ban sự kiện", gen: "GEN 18 | HK2 2023", photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=400&fit=crop&crop=face" },
-        { name: "Cao Thị Hương Giang", role: "Trưởng ban nội dung", gen: "HK1 2024", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" },
-        { name: "Trương Hưng", role: "Trưởng ban thiết kế", gen: "GEN 19 | HK1 2024", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face" }
-      ]
-    },
-    {
-      term: "2023",
-      members: [
-        { name: "Trương Hoàng Phước", role: "Trưởng ban Nội dung", gen: "Gen 18", photo: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=300&h=400&fit=crop&crop=face" },
-        { name: "Nguyễn Hồng Ngọc", role: "Phó ban Thiết kế", gen: "Gen 18", photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=400&fit=crop&crop=face" },
-        { name: "Ngô Mỹ Ngọc", role: "Ban Sự kiện", gen: "Gen 18", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=400&fit=crop&crop=face" },
-        { name: "Nguyễn Hải Đường", role: "Ban Truyền thông", gen: "Gen 18", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" },
-        { name: "Vũ Minh Trí", role: "Ban Hậu cần", gen: "Gen 18", photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face" }
-      ]
-    },
-    {
-      term: "2022",
-      members: [
-        { name: "Mai Thanh Phú", role: "Chủ nhiệm CLB", gen: "Gen 17", photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=400&fit=crop&crop=face" },
-        { name: "Nguyễn Ái Dĩ", role: "Trưởng ban Nội dung", gen: "Gen 17", photo: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=300&h=400&fit=crop&crop=face" },
-        { name: "Nguyễn Ái Trúc", role: "Ban Thiết kế", gen: "Gen 17", photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=400&fit=crop&crop=face" }
-      ]
-    },
-    {
-      term: "2021",
-      members: [
-        { name: "Trần Minh", role: "Phó Chủ nhiệm", gen: "Gen 16", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face" },
-        { name: "Lê Phương", role: "Trưởng ban Sự kiện", gen: "Gen 16", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" }
-      ]
-    },
-    {
-      term: "2020",
-      members: [
-        { name: "Đoàn Hải", role: "Chủ nhiệm CLB", gen: "Gen 15", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" }
+        { name: "Ngô Sỹ Bảo Duy", role: "Chủ nhiệm CLB", level: 5, photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" },
+        { name: "Nguyễn Hoàng Đức Phương", role: "Trưởng ban Sự kiện", level: 4, photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=400&fit=crop&crop=face" },
+        { name: "Cao Thị Hương Giang", role: "Trưởng ban Nội dung", level: 4, photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" },
+        { name: "Trương Hưng", role: "Trưởng ban Thiết kế", level: 4, photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face" },
+        { name: "Trương Hoàng Phước", role: "Ban Nội dung", level: 3, photo: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=300&h=400&fit=crop&crop=face" },
+        { name: "Nguyễn Hồng Ngọc", role: "Ban Thiết kế", level: 3, photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&h=400&fit=crop&crop=face" },
+        { name: "Ngô Mỹ Ngọc", role: "Ban Sự kiện", level: 3, photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=400&fit=crop&crop=face" },
+        { name: "Nguyễn Hải Đường", role: "Ban Truyền thông", level: 3, photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" },
+        { name: "Vũ Minh Trí", role: "Ban Hậu cần", level: 3, photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=400&fit=crop&crop=face" },
+        { name: "Mai Thanh Phú", role: "Ban Truyền thông", level: 2, photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=400&fit=crop&crop=face" },
+        { name: "Nguyễn Ái Dĩ", role: "Ban Nội dung", level: 2, photo: "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=300&h=400&fit=crop&crop=face" },
+        { name: "Nguyễn Ái Trúc", role: "Ban Thiết kế", level: 2, photo: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&h=400&fit=crop&crop=face" },
+        { name: "Trần Minh", role: "CTV", level: 1, photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=400&fit=crop&crop=face" },
+        { name: "Lê Phương", role: "CTV", level: 1, photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=400&fit=crop&crop=face" },
+        { name: "Đoàn Hải", role: "CTV", level: 1, photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop&crop=face" }
       ]
     }
   ],
