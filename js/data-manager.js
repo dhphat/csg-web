@@ -1,35 +1,130 @@
-// ===== Data Manager =====
-// Manages loading, saving, and accessing site data from Supabase
+// ===== Data Manager V2 (Relational Database Version) =====
+// Manages loading, saving, and mapping site data from 10 separate Supabase tables
 
 import { supabase } from './supabase.js';
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 const DataManager = {
   _data: null,
   _loaded: false,
   _loadPromise: null,
 
-  /** Load data from Supabase (or fallback to empty defaults) */
+  /** Load data from Multi-tables Supabase into Front-end JSON Tree */
   async load() {
-    // Avoid duplicate fetches
     if (this._loadPromise) return this._loadPromise;
 
     this._loadPromise = (async () => {
       try {
-        const { data, error } = await supabase
-          .from('site_data')
-          .select('data')
-          .eq('id', 'main')
-          .single();
+        const [
+          { data: settings },
+          { data: projects },
+          { data: departments },
+          { data: teams },
+          { data: members },
+          { data: awards },
+          { data: collaborators },
+          { data: sponsors },
+          { data: media },
+          { data: hof }
+        ] = await Promise.all([
+          supabase.from('csg_settings').select('*'),
+          supabase.from('csg_projects').select('*'),
+          supabase.from('csg_departments').select('*'),
+          supabase.from('csg_teams').select('*'),
+          supabase.from('csg_members').select('*'),
+          supabase.from('csg_awards').select('*'),
+          supabase.from('csg_collaborators').select('*'),
+          supabase.from('csg_sponsors').select('*'),
+          supabase.from('csg_media').select('*'),
+          supabase.from('csg_hall_of_fame').select('*'),
+        ]);
 
-        if (error) throw error;
+        const def = this._getDefaults();
 
-        if (data && data.data && Object.keys(data.data).length > 0) {
-          this._data = this._deepMerge(this._getDefaults(), data.data);
-        } else {
-          this._data = this._getDefaults();
+        // 1. Dữ liệu tĩnh (Settings)
+        if (settings) {
+          settings.forEach(s => {
+            if (def[s.type]) def[s.type] = this._deepMerge(def[s.type], s.data);
+          });
         }
+
+        // 2. Dự án 
+        if (projects) {
+          def.projects = projects;
+          def.projectCategories = [...new Set(projects.map(p => p.category))].filter(Boolean);
+        }
+
+        // 3. Giải thưởng, Đối tác, Nhà tài trợ
+        if (awards) def.awards = awards;
+        if (sponsors) def.sponsors = sponsors;
+        if (collaborators) def.collaborators = collaborators;
+        if (media) def.mediaEcosystem.channels = media;
+
+        // 4. Vinh danh
+        if (hof) {
+            hof.forEach(h => {
+               // VD h.period_type='yearly', h.award_type='individuals'
+               let pType = h.period_type; // 'yearly' / 'semesters'
+               let aType = h.award_type; // 'individuals' / 'collectives'
+               
+               if(!def.hallOfFame[aType]) def.hallOfFame[aType] = { yearly: [], semesters: [] };
+               let arr = def.hallOfFame[aType][pType];
+               if(!arr) arr = [];
+               
+               let periodMatch = arr.find(x => x.year === h.period_name || x.semester === h.period_name);
+               if(!periodMatch) { 
+                 periodMatch = pType === 'yearly' ? { year: h.period_name, categories: [] } : { semester: h.period_name, categories: [] }; 
+                 arr.push(periodMatch); 
+               }
+               
+               let c = periodMatch.categories.find(x => x.name === h.category);
+               if(!c) { c = { name: h.category, members: [] }; periodMatch.categories.push(c); }
+               
+               c.members.push({ recipient: h.recipient, image: h.image, id: h.id });
+               def.hallOfFame[aType][pType] = arr;
+            });
+        }
+
+        // 5. Hierarchy Ban -> Nhóm -> TV
+        if (departments) {
+            def.departments = departments.map(d => {
+                const dTeams = (teams || []).filter(t => t.department_id === d.id).map(t => {
+                   const tMembers = (members || []).filter(m => m.team_id === t.id).map(m => ({
+                       id: m.id, name: m.name, role: m.role, photo: m.photo
+                   }));
+                   return { ...t, members: tMembers };
+                });
+                return { ...d, teams: dTeams };
+            });
+        }
+        
+        // 6. Ban Chủ nhiệm & Chủ tịch
+        if (members) {
+            def.presidents = members.filter(m => m.type === 'president').map(m => ({
+                id: m.id, name: m.name, gen: m.generation, term: m.term, photo: m.photo
+            }));
+            
+            const board = members.filter(m => m.type === 'board_member');
+            const termsMap = {};
+            board.forEach(m => {
+               if(!termsMap[m.term]) termsMap[m.term] = [];
+               termsMap[m.term].push({ id: m.id, name: m.name, role: m.role, level: m.level, photo: m.photo });
+            });
+            def.boardGenerations = Object.keys(termsMap).length > 0 ? Object.entries(termsMap).map(([term, mems]) => ({
+                term, members: mems
+            })) : [{ term: "Nhiệm kỳ hiện tại", members: [] }];
+        }
+
+        this._data = def;
+
       } catch (e) {
-        console.warn('Failed to load from Supabase, using defaults:', e);
+        console.error('Failed to load multi-tables:', e);
         this._data = this._getDefaults();
       }
       this._loaded = true;
@@ -39,59 +134,118 @@ const DataManager = {
     return this._loadPromise;
   },
 
-  /** Get current data (must call load() first on page init) */
   get() {
-    if (!this._data) {
-      this._data = this._getDefaults();
-    }
+    if (!this._data) this._data = this._getDefaults();
     return this._data;
   },
 
-  /** Save current data to Supabase */
+  /** Tự động băm nhỏ cấu trúc JSON trên Front-end để Save vào 10 Bảng Supabase */
   async save(data) {
     if (data) this._data = data;
-    try {
-      const { error } = await supabase
-        .from('site_data')
-        .update({
-          data: this._data,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', 'main');
+    const d = this._data;
 
-      if (error) throw error;
+    // Chuẩn bị Row Data (Chỉ trích xuất)
+    const settingsRows = [
+      { id: 'general', type: 'general', data: d.general },
+      { id: 'footer', type: 'footer', data: d.footer },
+      { id: 'home', type: 'home', data: d.home },
+      { id: 'about', type: 'about', data: d.about }
+    ];
+
+    const projectRows = (d.projects || []).map(p => ({
+        id: p.id || uuidv4(),
+        title: p.title || '', subtitle: p.subtitle || '', year: p.year || '',
+        category: p.category || '', image: p.image || '', banner: p.banner || '',
+        description: p.description || '', featured: p.featured || false, ongoing: p.ongoing || false,
+        links: p.links || [], milestones: p.milestones || [], stats: p.stats || {}
+    }));
+
+    const awardRows = (d.awards || []).map(a => ({ id: a.id || uuidv4(), title: a.title, image: a.image }));
+    const collabRows = (d.collaborators || []).map(c => ({ id: c.id || uuidv4(), name: c.name, photo: c.photo }));
+    const sponsorRows = (d.sponsors || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: c.logo }));
+    const mediaRows = (d.mediaEcosystem?.channels || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: c.logo, followers: c.followers, url: c.url }));
+
+    const hofRows = [];
+    ['individuals', 'collectives'].forEach(aType => {
+      ['yearly', 'semesters'].forEach(pType => {
+        const periods = (d.hallOfFame?.[aType]?.[pType] || []);
+        periods.forEach(period => {
+           const pName = period.year || period.semester;
+           (period.categories || []).forEach(cat => {
+               (cat.members || []).forEach(mem => {
+                   hofRows.push({ id: mem.id || uuidv4(), period_type: pType, period_name: pName, award_type: aType, category: cat.name, recipient: mem.recipient, image: mem.image });
+               });
+           });
+        });
+      });
+    });
+
+    const deptRows = [];
+    const teamRows = [];
+    const memberRows = [];
+
+    (d.departments || []).forEach(dept => {
+       const dId = uuidv4();
+       deptRows.push({ id: dId, name: dept.name, image: dept.image, description: dept.description });
+       (dept.teams || []).forEach(team => {
+          const tId = uuidv4();
+          teamRows.push({ id: tId, department_id: dId, name: team.name, image: team.image, description: team.description });
+          (team.members || []).forEach(mem => {
+             memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: mem.photo });
+          });
+       });
+    });
+
+    (d.boardGenerations || []).forEach(gen => {
+       (gen.members || []).forEach(mem => {
+           memberRows.push({ id: mem.id || uuidv4(), type: 'board_member', name: mem.name, role: mem.role, level: mem.level || 1, photo: mem.photo, term: gen.term });
+       });
+    });
+
+    (d.presidents || []).forEach(mem => {
+       memberRows.push({ id: mem.id || uuidv4(), type: 'president', name: mem.name, term: mem.term, generation: mem.gen, photo: mem.photo });
+    });
+
+    try {
+      const replaceTable = async (table, rows) => {
+        await supabase.from(table).delete().not('id', 'is', null); 
+        if (rows.length > 0) {
+            for (let i = 0; i < rows.length; i += 500) {
+              await supabase.from(table).insert(rows.slice(i, i+500));
+            }
+        }
+      };
+
+      await supabase.from('csg_settings').upsert(settingsRows);
+      await replaceTable('csg_projects', projectRows);
+      await replaceTable('csg_awards', awardRows);
+      await replaceTable('csg_collaborators', collabRows);
+      await replaceTable('csg_sponsors', sponsorRows);
+      await replaceTable('csg_media', mediaRows);
+      await replaceTable('csg_hall_of_fame', hofRows);
+
+      // Foreign keys: xóa con trước, cha sau
+      await supabase.from('csg_members').delete().not('id', 'is', null);
+      await supabase.from('csg_teams').delete().not('id', 'is', null);
+      await supabase.from('csg_departments').delete().not('id', 'is', null);
+
+      if (deptRows.length > 0) await supabase.from('csg_departments').insert(deptRows);
+      if (teamRows.length > 0) await supabase.from('csg_teams').insert(teamRows);
+      if (memberRows.length > 0) await replaceTable('csg_members', memberRows);
+
       return true;
     } catch (e) {
-      console.error('Failed to save data:', e);
+      console.error('Save failed:', e);
       return false;
     }
   },
 
-  /** Update a specific section */
-  async updateSection(key, value) {
-    if (!this._data) await this.load();
-    this._data[key] = value;
-    return this.save();
-  },
+  exportJSON() { return JSON.stringify(this.get(), null, 2); },
 
-  /** Reset to defaults (clears Supabase data too) */
-  async reset() {
-    this._data = this._getDefaults();
-    await this.save();
-    return this._data;
-  },
-
-  /** Export data as JSON string */
-  exportJSON() {
-    return JSON.stringify(this.get(), null, 2);
-  },
-
-  /** Import data from JSON string */
   async importJSON(jsonStr) {
     try {
-      const parsed = JSON.parse(jsonStr);
-      this._data = parsed;
-      await this.save();
+      this._data = JSON.parse(jsonStr);
+      await this.save(this._data);
       return true;
     } catch (e) {
       console.error('Invalid JSON:', e);
@@ -99,78 +253,12 @@ const DataManager = {
     }
   },
 
-  /** Find a project by ID */
-  getProject(id) {
-    const data = this.get();
-    return (data.projects || []).find(p => p.id === id) || null;
-  },
+  getProject(id) { return (this.get().projects || []).find(p => p.id === id) || null; },
+  getDepartment(id) { return (this.get().departments || []).find(d => d.id === id) || null; },
 
-  /** Find a department by ID */
-  getDepartment(id) {
-    const data = this.get();
-    return (data.departments || []).find(d => d.id === id) || null;
-  },
-
-  /** Empty default structure */
-  _getDefaults() {
-    return {
-      general: {
-        siteName: "Cóc Sài Gòn",
-        siteTagline: "Câu lạc bộ Truyền thông",
-        logoUrl: "/assets/logo/logo.svg",
-        description: "Câu lạc bộ Truyền thông Cóc Sài Gòn - CLB xuất sắc 7 năm liên tiếp tại trường Đại học FPT HCM.",
-        socialLinks: { facebook: "#", instagram: "#", tiktok: "#", youtube: "#" }
-      },
-      nav: [
-        { label: "Trang chủ", href: "/" },
-        { label: "Dự án", href: "/project" },
-        { label: "Vinh danh", href: "/hall-of-fame" },
-        { label: "Thành viên", href: "/member" },
-        { label: "Ấn tượng", href: "/achievement" },
-        { label: "Về Cóc", href: "/about" }
-      ],
-      home: {
-        hero: { banners: [] },
-        diary: { title: "", tag: "", cardTitle: "", cardDesc: "", cardImage: "" },
-        gallery: { title: "", items: [] },
-        stats: { title: "Những con số ấn tượng", items: [] },
-        testimonials: { title: "", items: [] }
-      },
-      projectCategories: [],
-      projects: [],
-      awards: [],
-      departments: [],
-      about: {
-        quote: "",
-        introText: "",
-        blocks: [],
-        benefits: { title: "", items: [] }
-      },
-      hallOfFame: {
-        individuals: { yearly: [], semesters: [] },
-        collectives: { yearly: [], semesters: [] }
-      },
-      presidents: [],
-      boardGenerations: [{ term: "Nhiệm kỳ hiện tại", members: [] }],
-      mediaEcosystem: { totalFollowers: "", channels: [] },
-      sponsors: [],
-      collaborators: [],
-      footer: {
-        description: "",
-        address: "",
-        email: "",
-        phone: "",
-        affiliates: [],
-        projectLinks: [],
-        otherLinks: [],
-        competitions: []
-      }
-    };
-  },
-
-  /** Deep merge helper */
   _deepMerge(target, source) {
     const result = { ...target };
+    if(!source) return result;
     for (const key of Object.keys(source)) {
       if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         result[key] = this._deepMerge(target[key] || {}, source[key]);
@@ -179,7 +267,21 @@ const DataManager = {
       }
     }
     return result;
+  },
+
+  _getDefaults() {
+    return {
+      general: { siteName: "Cóc Sài Gòn", siteTagline: "Câu lạc bộ Truyền thông", logoUrl: "/assets/logo/logo.svg", description: "", socialLinks: { facebook: "#", instagram: "#", tiktok: "#", youtube: "#" } },
+      nav: [ { label: "Trang chủ", href: "/" }, { label: "Dự án", href: "/project" }, { label: "Vinh danh", href: "/hall-of-fame" }, { label: "Thành viên", href: "/member" }, { label: "Ấn tượng", href: "/achievement" }, { label: "Về Cóc", href: "/about" } ],
+      home: { hero: { banners: [] }, diary: { title: "", tag: "", cardTitle: "", cardDesc: "", cardImage: "" }, gallery: { title: "", items: [] }, stats: { title: "Những con số ấn tượng", items: [] }, testimonials: { title: "", items: [] } },
+      projectCategories: [], projects: [], awards: [], departments: [],
+      about: { quote: "", introText: "", blocks: [], benefits: { title: "", items: [] } },
+      hallOfFame: { individuals: { yearly: [], semesters: [] }, collectives: { yearly: [], semesters: [] } },
+      presidents: [], boardGenerations: [{ term: "Nhiệm kỳ hiện tại", members: [] }], mediaEcosystem: { totalFollowers: "", channels: [] }, sponsors: [], collaborators: [],
+      footer: { description: "", address: "", email: "", phone: "", affiliates: [], projectLinks: [], otherLinks: [], competitions: [] }
+    };
   }
 };
 
 export default DataManager;
+window.DataManager = DataManager;
