@@ -28,7 +28,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        project: resolve(__dirname, 'project.html'),
+        projects: resolve(__dirname, 'projects.html'),
         'project-detail': resolve(__dirname, 'project-detail.html'),
         'hall-of-fame': resolve(__dirname, 'hall-of-fame.html'),
         member: resolve(__dirname, 'member.html'),
