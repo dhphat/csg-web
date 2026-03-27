@@ -1056,13 +1056,12 @@ function showProjectAdvancedModal(index, forceCategory = false) {
             <div class="form-group"><label>${isCat ? 'Tên chuyên mục' : 'Tên dự án'}</label><input type="text" id="m-title" value="${esc(p.title)}"></div>
             <div class="form-group"><label>Mô tả ngắn</label><input type="text" id="m-subtitle" value="${esc(p.subtitle)}"></div>
             <div class="form-row" style="${isCat ? 'display:none;' : ''}">
-              <div class="form-group"><label>Năm</label><input type="text" id="m-year" value="${esc(p.year)}"></div>
               <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:25px;white-space:nowrap;">
                 <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-feat" ${p.featured ? 'checked' : ''}> Nổi bật</label>
                 <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-ongoing" ${p.ongoing ? 'checked' : ''}> Đang diễn ra</label>
               </div>
             </div>
-            ${isCat ? `<input type="hidden" id="m-year" value="Chuyên mục"><input type="hidden" id="m-feat" value="false"><input type="hidden" id="m-ongoing" value="false">` : ''}
+            ${isCat ? `<input type="hidden" id="m-feat" value="false"><input type="hidden" id="m-ongoing" value="false">` : ''}
             <div class="form-group"><label>${isCat ? 'Logo chuyên mục' : 'Poster dự án'}</label>${imageUploadField(p.image, 'm-img', 'projects')}</div>
             <div class="form-group"><label>Banner dự án</label>${imageUploadField(p.banner, 'm-banner', 'projects')}</div>
             <div class="form-group"><label>${isCat ? 'Chi tiết chuyên mục' : 'Chi tiết dự án'}</label><textarea id="m-desc" style="min-height:300px; resize:vertical;">${esc(p.description)}</textarea></div>
@@ -1118,14 +1117,26 @@ function showProjectAdvancedModal(index, forceCategory = false) {
     overlay.querySelector('#m-cancel').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#m-close').onclick = () => { cleanup(); overlay.remove(); };
     msBtn.onclick = () => {
+      if (!isCat) {
+        if (currentMilestones.length === 0) {
+          alert('Vui lòng thêm ít nhất 1 Mốc thời gian cho dự án!');
+          return;
+        }
+        if (!currentMilestones[0].date) {
+          alert('Vui lòng chọn Ngày hợp lệ cho Mốc thời gian đầu tiên!');
+          return;
+        }
+      }
+
       msBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
       msBtn.disabled = true;
       setTimeout(() => {
+        let derivedYear = isCat ? 'Chuyên mục' : currentMilestones[0].date.split('-')[0];
         const basic = {
           id: overlay.querySelector('#m-id').value,
           title: overlay.querySelector('#m-title').value,
           subtitle: overlay.querySelector('#m-subtitle').value,
-          year: overlay.querySelector('#m-year').value,
+          year: derivedYear,
           category: overlay.querySelector('#m-cat').value,
           image: getUploadedUrl('m-img'),
           banner: getUploadedUrl('m-banner'),
@@ -1165,7 +1176,7 @@ function showProjectAdvancedModal(index, forceCategory = false) {
     p.id = overlay.querySelector('#m-id').value;
     p.title = overlay.querySelector('#m-title').value;
     p.subtitle = overlay.querySelector('#m-subtitle').value;
-    p.year = overlay.querySelector('#m-year').value;
+    p.year = isCat ? 'Chuyên mục' : (currentMilestones.length > 0 && currentMilestones[0].date ? currentMilestones[0].date.split('-')[0] : p.year);
     p.category = overlay.querySelector('#m-cat').value;
     p.image = getUploadedUrl('m-img') || p.image;
     p.banner = getUploadedUrl('m-banner') || p.banner;
