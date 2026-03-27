@@ -57,7 +57,11 @@ const DataManager = {
         // 2. Dự án 
         if (projects) {
           def.projects = projects;
-          def.projectCategories = [...new Set(projects.map(p => p.category))].filter(Boolean);
+          def.projectCategories = projects.filter(p => p.year === 'Chuyên mục').map(p => ({
+            id: p.id,
+            name: p.title,
+            logo: p.image
+          }));
         }
 
         // 3. Giải thưởng, Đối tác, Nhà tài trợ

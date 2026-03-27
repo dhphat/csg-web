@@ -55,7 +55,7 @@
       `;
 
       // 2. Featured
-      const featured = projects.filter(p => p.featured);
+      const featured = projects.filter(p => p.featured && p.year !== 'Chuyên mục');
       let featuredHtml = '';
       if(featured.length > 0) {
         const featCards = featured.map(p => `
