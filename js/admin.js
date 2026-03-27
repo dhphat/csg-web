@@ -86,10 +86,32 @@ function initSidebar() {
   });
 }
 
-// ===== Top Actions =====
 function initTopActions() {
-  // Save
+  window.isDirty = false;
+  window.setDirty = function(state = true) {
+    window.isDirty = state;
+    const btn = document.getElementById('btn-save');
+    if (btn) {
+      if (state) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Cần lưu thay đổi *';
+        btn.style.opacity = '1';
+        btn.style.boxShadow = '0 0 8px rgba(255, 222, 33, 0.5)';
+      } else {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-check"></i> Đã lưu';
+        btn.style.opacity = '0.5';
+        btn.style.boxShadow = 'none';
+      }
+    }
+  };
+
+  // Init
+  window.setDirty(false);
+
+  // Save global
   document.getElementById('btn-save')?.addEventListener('click', async () => {
+    if (!window.isDirty) return;
     const btn = document.getElementById('btn-save');
     const oldText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
@@ -97,7 +119,9 @@ function initTopActions() {
 
     const success = await DataManager.save(siteData);
     if (success) {
-      showToast('Đã lưu dữ liệu lên Cloud!', 'success');
+      showToast('Đã đồng bộ lên Cloud!', 'success');
+      window.setDirty(false);
+      return;
     } else {
       showToast('Lưu thất bại!', 'error');
     }
@@ -779,28 +803,28 @@ function handleAction(dataset) {
     case 'add-footer-item': showFooterItemModal(key); break;
     case 'edit-footer-item': showFooterItemModal(key, i); break;
     case 'delete-footer-item':
-      if (confirm('Xóa?')) { siteData.footer[key].splice(i, 1); renderSection('footer'); }
+      if (confirm('Xóa?')) { siteData.footer[key].splice(i, 1); renderSection('general'); }
       break;
 
     // Gallery
     case 'add-gallery': showGalleryModal(); break;
     case 'edit-gallery': showGalleryModal(i); break;
     case 'delete-gallery':
-      if (confirm('Xóa?')) { siteData.home.gallery.items.splice(i, 1); renderSection('home'); }
+      if (confirm('Xóa?')) { siteData.home.gallery.items.splice(i, 1); renderSection('general'); }
       break;
 
     // Stats
     case 'add-stat': showStatModal(); break;
     case 'edit-stat': showStatModal(i); break;
     case 'delete-stat':
-      if (confirm('Xóa?')) { siteData.home.stats.items.splice(i, 1); renderSection('home'); }
+      if (confirm('Xóa?')) { siteData.home.stats.items.splice(i, 1); renderSection('general'); }
       break;
 
     // Banners
     case 'add-banner': showBannerModal(); break;
     case 'edit-banner': showBannerModal(i); break;
     case 'delete-banner':
-      if (confirm('Xóa banner này?')) { siteData.home.hero.banners.splice(i, 1); renderSection('home'); }
+      if (confirm('Xóa banner này?')) { siteData.home.hero.banners.splice(i, 1); renderSection('general'); }
       break;
 
     // Media Ecosystem Channels
@@ -916,7 +940,7 @@ function showModal(title, fields, onSave) {
       ${fieldsHtml}
       <div class="modal-actions">
         <button class="btn-secondary" id="modal-cancel">Hủy</button>
-        <button class="btn-primary" id="modal-save"><i class="fas fa-check"></i> Lưu</button>
+        <button class="btn-primary" id="modal-save" style="opacity:0.5;" disabled><i class="fas fa-check"></i> Lưu</button>
       </div>
     </div>
   `;
@@ -924,21 +948,32 @@ function showModal(title, fields, onSave) {
   document.body.appendChild(overlay);
   bindUploadEvents();
 
+  const mSave = overlay.querySelector('#modal-save');
+  overlay.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener('input', () => { mSave.disabled = false; mSave.style.opacity = '1'; });
+    el.addEventListener('change', () => { mSave.disabled = false; mSave.style.opacity = '1'; });
+  });
+
   overlay.querySelector('#modal-cancel').addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 
-  overlay.querySelector('#modal-save').addEventListener('click', () => {
-    const values = {};
-    fields.forEach(f => {
-      const el = document.getElementById(`modal-${f.key}`);
-      if (f.type === 'image') {
-        values[f.key] = getUploadedUrl(`modal-${f.key}`);
-      } else {
-        values[f.key] = f.type === 'checkbox' ? el.checked : el.value;
-      }
-    });
-    onSave(values);
-    overlay.remove();
+  mSave.addEventListener('click', () => {
+    mSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+    mSave.disabled = true;
+    setTimeout(() => {
+      const values = {};
+      fields.forEach(f => {
+        const el = document.getElementById(`modal-${f.key}`);
+        if (f.type === 'image') {
+          values[f.key] = getUploadedUrl(`modal-${f.key}`);
+        } else {
+          values[f.key] = f.type === 'checkbox' ? el.checked : el.value;
+        }
+      });
+      if(window.setDirty) window.setDirty(true);
+      onSave(values);
+      overlay.remove();
+    }, 400); // UI delay for better UX
   });
 }
 
@@ -1045,35 +1080,46 @@ function showProjectAdvancedModal(index) {
 
         <div class="modal-actions">
           <button class="btn-secondary" id="m-cancel">Hủy</button>
-          <button class="btn-primary" id="m-save" style="padding:12px 40px;font-size:1rem;"><i class="fas fa-save"></i> LƯU DỰ ÁN</button>
+          <button class="btn-primary" id="m-save" style="padding:12px 40px;font-size:1rem;opacity:0.5;" disabled><i class="fas fa-save"></i> LƯU DỰ ÁN</button>
         </div>
       </div>
     `;
 
+    const msBtn = overlay.querySelector('#m-save');
+    overlay.querySelectorAll('input, select, textarea').forEach(el => {
+      el.addEventListener('input', () => { msBtn.disabled = false; msBtn.style.opacity = '1'; });
+      el.addEventListener('change', () => { msBtn.disabled = false; msBtn.style.opacity = '1'; });
+    });
+
     overlay.querySelector('#m-cancel').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#m-close').onclick = () => { cleanup(); overlay.remove(); };
-    overlay.querySelector('#m-save').onclick = () => {
-      const basic = {
-        id: overlay.querySelector('#m-id').value,
-        title: overlay.querySelector('#m-title').value,
-        subtitle: overlay.querySelector('#m-subtitle').value,
-        year: overlay.querySelector('#m-year').value,
-        category: overlay.querySelector('#m-cat').value,
-        image: getUploadedUrl('m-img'),
-        banner: getUploadedUrl('m-banner'),
-        description: overlay.querySelector('#m-desc').value,
-        featured: overlay.querySelector('#m-feat').checked,
-        ongoing: overlay.querySelector('#m-ongoing').checked
-      };
+    msBtn.onclick = () => {
+      msBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+      msBtn.disabled = true;
+      setTimeout(() => {
+        const basic = {
+          id: overlay.querySelector('#m-id').value,
+          title: overlay.querySelector('#m-title').value,
+          subtitle: overlay.querySelector('#m-subtitle').value,
+          year: overlay.querySelector('#m-year').value,
+          category: overlay.querySelector('#m-cat').value,
+          image: getUploadedUrl('m-img'),
+          banner: getUploadedUrl('m-banner'),
+          description: overlay.querySelector('#m-desc').value,
+          featured: overlay.querySelector('#m-feat').checked,
+          ongoing: overlay.querySelector('#m-ongoing').checked
+        };
 
-      const updated = { ...p, ...basic, milestones: currentMilestones, links: currentLinks, stats: currentStats };
-      if (index !== undefined) { siteData.projects[index] = updated; } 
-      else { updated.gallery = updated.gallery || []; siteData.projects.push(updated); }
-      
-      cleanup();
-      overlay.remove();
-      renderSection('projects');
-      showToast('Đã cập nhật dự án thành công');
+        const updated = { ...p, ...basic, milestones: currentMilestones, links: currentLinks, stats: currentStats };
+        if (index !== undefined) { siteData.projects[index] = updated; } 
+        else { updated.gallery = updated.gallery || []; siteData.projects.push(updated); }
+        
+        if(window.setDirty) window.setDirty(true);
+        cleanup();
+        overlay.remove();
+        renderSection('projects');
+        showToast('Đã cập nhật dự án thành công');
+      }, 400);
     };
   };
 
@@ -1084,7 +1130,22 @@ function showProjectAdvancedModal(index) {
     delete window._projModalDelete;
   };
 
+  const syncDOMToP = () => {
+    if (!overlay.querySelector('#m-title')) return;
+    p.id = overlay.querySelector('#m-id').value;
+    p.title = overlay.querySelector('#m-title').value;
+    p.subtitle = overlay.querySelector('#m-subtitle').value;
+    p.year = overlay.querySelector('#m-year').value;
+    p.category = overlay.querySelector('#m-cat').value;
+    p.image = getUploadedUrl('m-img') || p.image;
+    p.banner = getUploadedUrl('m-banner') || p.banner;
+    p.description = overlay.querySelector('#m-desc').value;
+    p.featured = overlay.querySelector('#m-feat').checked;
+    p.ongoing = overlay.querySelector('#m-ongoing').checked;
+  };
+
   window._projModalAdd = (type) => {
+    syncDOMToP();
     if (type === 'milestone') currentMilestones.push({label:'', date:''});
     if (type === 'link') currentLinks.push({label:'', url:''});
     if (type === 'stat') currentStats['Mới'] = '';
@@ -1105,6 +1166,7 @@ function showProjectAdvancedModal(index) {
     }
   };
   window._projModalDelete = (type, i) => {
+    syncDOMToP();
     if (type === 'milestone') currentMilestones.splice(i, 1);
     if (type === 'link') currentLinks.splice(i, 1);
     if (type === 'stat') delete currentStats[Object.keys(currentStats)[i]];
@@ -1414,7 +1476,7 @@ function showFooterItemModal(key, index) {
       if (!siteData.footer[key]) siteData.footer[key] = [];
       siteData.footer[key].push(vals);
     }
-    renderSection('footer');
+    renderSection('general');
   });
 }
 
@@ -1429,7 +1491,7 @@ function showGalleryModal(index) {
     } else {
       siteData.home.gallery.items.push(vals);
     }
-    renderSection('home');
+    renderSection('general');
   });
 }
 
@@ -1446,7 +1508,7 @@ function showStatModal(index) {
     } else {
       siteData.home.stats.items.push(stat);
     }
-    renderSection('home');
+    renderSection('general');
   });
 }
 
@@ -1462,7 +1524,7 @@ function showBannerModal(index) {
       if (!siteData.home.hero.banners) siteData.home.hero.banners = [];
       siteData.home.hero.banners.push(vals);
     }
-    renderSection('home');
+    renderSection('general');
   });
 }
 
