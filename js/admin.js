@@ -111,50 +111,6 @@ function initTopActions() {
     await supabase.auth.signOut();
     window.location.reload();
   });
-
-  // Export
-  document.getElementById('btn-export')?.addEventListener('click', () => {
-    const json = DataManager.exportJSON();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `csg-data-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Đã xuất file JSON!', 'success');
-  });
-
-  // Import
-  document.getElementById('btn-import')?.addEventListener('click', () => {
-    document.getElementById('import-file').click();
-  });
-
-  document.getElementById('import-file')?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (DataManager.importJSON(ev.target.result)) {
-        siteData = DataManager.get();
-        renderSection(currentSection);
-        showToast('Đã import thành công!', 'success');
-      } else {
-        showToast('File JSON không hợp lệ!', 'error');
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
-  });
-
-  // Reset
-  document.getElementById('btn-reset')?.addEventListener('click', () => {
-    if (confirm('Bạn có chắc muốn reset về mặc định? Tất cả thay đổi sẽ bị mất.')) {
-      siteData = DataManager.reset();
-      renderSection(currentSection);
-      showToast('Đã reset về mặc định!', 'success');
-    }
-  });
 }
 
 // ===== Render Section =====
