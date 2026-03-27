@@ -1047,7 +1047,7 @@ function showProjectAdvancedModal(index) {
               <div class="form-group"><label>Thể loại</label><input type="text" id="m-cat" value="${esc(p.category)}"></div>
             </div>
             <div class="form-group"><label>Tên dự án</label><input type="text" id="m-title" value="${esc(p.title)}"></div>
-            <div class="form-group"><label>Phụ đề</label><input type="text" id="m-subtitle" value="${esc(p.subtitle)}"></div>
+            <div class="form-group"><label>Slogan/Tagline</label><input type="text" id="m-subtitle" value="${esc(p.subtitle)}"></div>
             <div class="form-row">
               <div class="form-group"><label>Năm</label><input type="text" id="m-year" value="${esc(p.year)}"></div>
               <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:25px;white-space:nowrap;">
@@ -1057,7 +1057,7 @@ function showProjectAdvancedModal(index) {
             </div>
             <div class="form-group"><label>Poster dự án</label>${imageUploadField(p.image, 'm-img', 'projects')}</div>
             <div class="form-group"><label>Banner dự án</label>${imageUploadField(p.banner, 'm-banner', 'projects')}</div>
-            <div class="form-group"><label>Mô tả</label><textarea id="m-desc" style="min-height:120px;">${esc(p.description)}</textarea></div>
+            <div class="form-group"><label>Mô tả</label><textarea id="m-desc" style="min-height:300px; resize:vertical;">${esc(p.description)}</textarea></div>
           </div>
 
           <div class="modal-dynamic-lists">
