@@ -38,7 +38,7 @@
 
       // 1. Categories
       const catCards = categories.map(c => `
-        <a href="/project-detail?id=${c.id}" class="project-category-item reveal">
+        <a href="/project/${c.id}" class="project-category-item reveal">
           <img src="${c.logo}" alt="${c.name}" />
           <span class="category-name">${c.name}</span>
         </a>
@@ -59,7 +59,7 @@
       let featuredHtml = '';
       if(featured.length > 0) {
         const featCards = featured.map(p => `
-          <a href="/project-detail?id=${p.id}" class="project-card reveal">
+          <a href="/project/${p.id}" class="project-card reveal">
             <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px;">
               <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>
@@ -96,7 +96,7 @@
       `;
 
       const projectCards = filteredProjects.map(p => `
-        <a href="/project-detail?id=${p.id}" class="project-card reveal" data-category="${p.year}">
+        <a href="/project/${p.id}" class="project-card reveal" data-category="${p.year}">
             <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px;">
               <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;" />
             </div>

@@ -9,7 +9,10 @@ export default defineConfig({
       name: 'html-rewrite',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url && !req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/@')) {
+          if (req.url && req.url.match(/^\/project\/[^\/.]+$/)) {
+            req.url = '/project-detail.html';
+          }
+          else if (req.url && !req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/@')) {
             const parsedUrl = new URL(req.url, 'http://localhost');
             const targetPath = path.join(__dirname, parsedUrl.pathname + '.html');
             if (fs.existsSync(targetPath)) {

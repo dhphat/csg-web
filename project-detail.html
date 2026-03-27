@@ -29,8 +29,11 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
-      const params = new URLSearchParams(window.location.search);
-      const projectId = params.get('id');
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      let projectId = new URLSearchParams(window.location.search).get('id');
+      if (!projectId && pathParts.includes('project') && pathParts.length >= 2) {
+          projectId = pathParts[pathParts.indexOf('project') + 1];
+      }
       const project = DataManager.getProject(projectId);
       const main = document.getElementById('project-detail-main');
 
