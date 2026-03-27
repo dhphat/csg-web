@@ -292,7 +292,7 @@ function renderCategories() {
   }).join('');
 
   return `
-    <div class="admin-card">
+    <div class="admin-card" id="admin-categories-section">
       <div class="admin-card-header">
         <h3>Chuyên mục (${cats.length})</h3>
         <button class="btn-add" data-action="add-category"><i class="fas fa-plus"></i> Thêm chuyên mục</button>
@@ -1134,6 +1134,12 @@ function showProjectAdvancedModal(index) {
         cleanup();
         overlay.remove();
         renderSection('projects');
+        if (updated.year === 'Chuyên mục') {
+            setTimeout(() => {
+                const el = document.getElementById('admin-categories-section');
+                if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
         showToast('Đã cập nhật dự án thành công');
       }, 400);
     };
@@ -1363,7 +1369,12 @@ function showCategoryModal() {
       gallery: [],
       featured: false
     });
-    renderSection('categories');
+    if(window.setDirty) window.setDirty(true);
+    renderSection('projects');
+    setTimeout(() => {
+        const el = document.getElementById('admin-categories-section');
+        if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   });
 }
 
