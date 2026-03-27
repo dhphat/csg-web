@@ -1,8 +1,18 @@
 // ===== Main JavaScript =====
 
 import Renderer from './renderer.js';
+import DataManager from './data-manager.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// Global promise that resolves when data is loaded
+window.__csgDataReady = (async () => {
+  await DataManager.load();
+  return true;
+})();
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Wait for data to be loaded from Supabase
+  await window.__csgDataReady;
+
   // Render header + footer from data
   Renderer.init();
 

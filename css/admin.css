@@ -589,3 +589,70 @@
     font-size: 1rem;
   }
 }
+
+/* Image Upload Field */
+.image-upload-field {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  margin-top: 6px;
+}
+
+.upload-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px dashed #333;
+}
+
+.upload-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(212, 168, 67, 0.15);
+  border: 1px solid #FFDE21;
+  border-radius: 6px;
+  color: #FFDE21;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-upload:hover {
+  background: rgba(212, 168, 67, 0.3);
+}
+
+.btn-upload:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-status {
+  font-size: 0.75rem;
+  color: #666;
+}

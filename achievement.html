@@ -26,7 +26,8 @@
   <script type="module">
     import DataManager from '/js/data-manager.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await window.__csgDataReady;
       const data = DataManager.get();
       const awards = data.awards || [];
       const projects = (data.projects || []).filter(p => p.stats && Object.keys(p.stats).length > 0);

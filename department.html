@@ -24,7 +24,8 @@
   <script type="module">
     import DataManager from '/js/data-manager.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await window.__csgDataReady;
       const params = new URLSearchParams(window.location.search);
       const deptId = params.get('id');
       const dept = DataManager.getDepartment(deptId);

@@ -26,7 +26,8 @@
   <script type="module">
     import DataManager from '/js/data-manager.js';
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await window.__csgDataReady;
       const data = DataManager.get();
       const boardGen = data.boardGenerations || [];
       const main = document.getElementById('member-main');

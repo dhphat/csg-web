@@ -1,15 +1,66 @@
 // ===== Admin Panel JavaScript =====
 import DataManager from './data-manager.js';
+import { supabase } from './supabase.js';
+import { imageUploadField, bindUploadEvents, getUploadedUrl } from './admin-upload.js';
 
 let siteData = null;
 let currentSection = 'general';
+let session = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check auth
+  const { data: { session: currentSession } } = await supabase.auth.getSession();
+  session = currentSession;
+
+  const loading = document.getElementById('admin-loading');
+  const loginScreen = document.getElementById('login-screen');
+  const adminPanel = document.getElementById('admin-panel');
+
+  if (!session) {
+    if (loading) loading.classList.add('hidden');
+    if (loginScreen) loginScreen.style.display = 'flex';
+    initLogin();
+    return;
+  }
+
+  // Load data from Supabase
+  await DataManager.load();
   siteData = DataManager.get();
+  
+  if (loading) loading.classList.add('hidden');
+  if (adminPanel) adminPanel.style.display = 'block';
+
   initSidebar();
   initTopActions();
   renderSection('general');
 });
+
+function initLogin() {
+  const btn = document.getElementById('login-btn');
+  const emailIn = document.getElementById('login-email');
+  const passIn = document.getElementById('login-password');
+  const err = document.getElementById('login-error');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    err.style.display = 'none';
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email: emailIn.value,
+      password: passIn.value,
+    });
+
+    if (error) {
+      err.textContent = 'Sai email hoặc mật khẩu!';
+      err.style.display = 'block';
+      btn.disabled = false;
+    } else {
+      window.location.reload();
+    }
+  });
+}
 
 // ===== Sidebar Navigation =====
 function initSidebar() {
@@ -38,12 +89,27 @@ function initSidebar() {
 // ===== Top Actions =====
 function initTopActions() {
   // Save
-  document.getElementById('btn-save')?.addEventListener('click', () => {
-    if (DataManager.save(siteData)) {
-      showToast('Đã lưu thành công!', 'success');
+  document.getElementById('btn-save')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-save');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+    btn.disabled = true;
+
+    const success = await DataManager.save(siteData);
+    if (success) {
+      showToast('Đã lưu dữ liệu lên Cloud!', 'success');
     } else {
       showToast('Lưu thất bại!', 'error');
     }
+
+    btn.innerHTML = oldText;
+    btn.disabled = false;
+  });
+
+  // Logout
+  document.getElementById('btn-logout')?.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
   });
 
   // Export
@@ -880,6 +946,9 @@ function showModal(title, fields, onSave) {
     if (f.type === 'checkbox') {
       return `<div class="form-group"><label><input type="checkbox" id="modal-${f.key}" ${f.value ? 'checked' : ''} /> ${f.label}</label></div>`;
     }
+    if (f.type === 'image') {
+      return `<div class="form-group"><label>${f.label}</label>${imageUploadField(f.value || '', 'modal-'+f.key, f.folder || 'general')}</div>`;
+    }
     return `<div class="form-group"><label>${f.label}</label><input type="${f.type || 'text'}" id="modal-${f.key}" value="${esc(f.value || '')}" /></div>`;
   }).join('');
 
@@ -897,6 +966,7 @@ function showModal(title, fields, onSave) {
   `;
 
   document.body.appendChild(overlay);
+  bindUploadEvents();
 
   overlay.querySelector('#modal-cancel').addEventListener('click', () => overlay.remove());
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
@@ -905,7 +975,11 @@ function showModal(title, fields, onSave) {
     const values = {};
     fields.forEach(f => {
       const el = document.getElementById(`modal-${f.key}`);
-      values[f.key] = f.type === 'checkbox' ? el.checked : el.value;
+      if (f.type === 'image') {
+        values[f.key] = getUploadedUrl(`modal-${f.key}`);
+      } else {
+        values[f.key] = f.type === 'checkbox' ? el.checked : el.value;
+      }
     });
     onSave(values);
     overlay.remove();
@@ -990,8 +1064,8 @@ function showProjectAdvancedModal(index) {
                 <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-ongoing" ${p.ongoing ? 'checked' : ''}> Đang diễn ra</label>
               </div>
             </div>
-            <div class="form-group"><label>Poster dự án (Thay ảnh thẻ URL)</label><input type="text" id="m-img" value="${esc(p.image)}"></div>
-            <div class="form-group"><label>Banner dự án (URL trống sẽ dùng Poster)</label><input type="text" id="m-banner" value="${esc(p.banner || '')}" placeholder="Bỏ trống nếu dùng Poster"></div>
+            <div class="form-group"><label>Poster dự án</label>${imageUploadField(p.image, 'm-img', 'projects')}</div>
+            <div class="form-group"><label>Banner dự án</label>${imageUploadField(p.banner, 'm-banner', 'projects')}</div>
             <div class="form-group"><label>Mô tả</label><textarea id="m-desc" style="min-height:120px;">${esc(p.description)}</textarea></div>
           </div>
 
@@ -1029,8 +1103,8 @@ function showProjectAdvancedModal(index) {
         subtitle: overlay.querySelector('#m-subtitle').value,
         year: overlay.querySelector('#m-year').value,
         category: overlay.querySelector('#m-cat').value,
-        image: overlay.querySelector('#m-img').value,
-        banner: overlay.querySelector('#m-banner').value,
+        image: getUploadedUrl('m-img'),
+        banner: getUploadedUrl('m-banner'),
         description: overlay.querySelector('#m-desc').value,
         featured: overlay.querySelector('#m-feat').checked,
         ongoing: overlay.querySelector('#m-ongoing').checked
@@ -1083,6 +1157,7 @@ function showProjectAdvancedModal(index) {
 
   renderModalContent();
   document.body.appendChild(overlay);
+  bindUploadEvents();
 }
 
 function showDeptAdvancedModal(index) {
@@ -1147,8 +1222,8 @@ function showDeptAdvancedModal(index) {
               <div class="form-group" style="flex:2;"><label>Tên Ban</label><input type="text" id="d-name" value="${esc(currentDept.name)}"></div>
             </div>
             <div class="form-group">
-              <label>Ảnh Ban (URL)</label>
-              <input type="text" id="d-img" value="${esc(currentDept.image || '')}">
+              <label>Ảnh Ban</label>
+              ${imageUploadField(currentDept.image || '', 'd-img', 'departments')}
             </div>
             <div class="form-group">
               <label>Mô tả Ban</label>
@@ -1176,7 +1251,7 @@ function showDeptAdvancedModal(index) {
     overlay.querySelector('#d-save').onclick = () => {
       currentDept.id = overlay.querySelector('#d-id').value;
       currentDept.name = overlay.querySelector('#d-name').value;
-      currentDept.image = overlay.querySelector('#d-img').value;
+      currentDept.image = getUploadedUrl('d-img');
       currentDept.description = overlay.querySelector('#d-desc').value;
       currentDept.subDepts = []; // Removed redundant field
 
@@ -1231,6 +1306,7 @@ function showDeptAdvancedModal(index) {
 
   renderModalContent();
   document.body.appendChild(overlay);
+  bindUploadEvents();
 }
 
 function showCategoryModal() {
@@ -1238,7 +1314,7 @@ function showCategoryModal() {
     { key: 'id', label: 'ID (slug)', value: '' },
     { key: 'title', label: 'Tên chuyên mục', value: '' },
     { key: 'subtitle', label: 'Phụ đề', value: '' },
-    { key: 'image', label: 'Ảnh URL', value: '' },
+    { key: 'image', label: 'Ảnh Minh họa', value: '', type: 'image', folder: 'projects' },
     { key: 'description', label: 'Mô tả', value: '', type: 'textarea' }
   ], (vals) => {
     siteData.projects.push({
@@ -1265,7 +1341,7 @@ function showMemberModal(index, yearIndex) {
     { key: 'name', label: 'Họ tên', value: m.name },
     { key: 'role', label: 'Vai trò', value: m.role },
     { key: 'level', label: 'Cấp độ (1: Thành viên -> 5: Cao nhất)', value: m.level?.toString() || '1', type: 'number' },
-    { key: 'photo', label: 'Ảnh URL', value: m.photo }
+    { key: 'photo', label: 'Ảnh Đại diện', value: m.photo, type: 'image', folder: 'members' }
   ], (vals) => {
     const member = { ...m, name: vals.name, role: vals.role, level: parseInt(vals.level) || 1, photo: vals.photo };
     if (index !== null) siteData.boardGenerations[yearIndex].members[index] = member;
@@ -1278,7 +1354,7 @@ function showAwardModal(index) {
   const a = index !== undefined ? siteData.awards[index] : {};
   showModal(index !== undefined ? 'Sửa danh hiệu' : 'Thêm danh hiệu', [
     { key: 'title', label: 'Tiêu đề', value: a.title },
-    { key: 'image', label: 'Ảnh Minh họa', value: a.image }
+    { key: 'image', label: 'Ảnh Minh họa', value: a.image, type: 'image', folder: 'awards' }
   ], (vals) => {
     if (index !== undefined) siteData.awards[index] = vals;
     else siteData.awards.push(vals);
@@ -1291,7 +1367,7 @@ function showHOFMemberModal(type, period, yi, ci, memberIdx) {
   const m = memberIdx !== undefined ? list[memberIdx] : {};
   showModal(memberIdx !== undefined ? 'Sửa' : 'Thêm', [
     { key: 'recipient', label: 'Người/Tập thể nhận', value: m.recipient },
-    { key: 'image', label: 'Ảnh URL', value: m.image }
+    { key: 'image', label: 'Ảnh chân dung', value: m.image, type: 'image', folder: 'halloffame' }
   ], (vals) => {
     if (memberIdx !== undefined) { list[memberIdx] = vals; } else { list.push(vals); }
     renderSection('halloffame');
@@ -1302,7 +1378,7 @@ function showSponsorModal(index) {
   const s = index !== undefined ? siteData.sponsors[index] : {};
   showModal(index !== undefined ? 'Sửa nhà tài trợ' : 'Thêm nhà tài trợ', [
     { key: 'name', label: 'Tên', value: s.name },
-    { key: 'logo', label: 'Logo URL', value: s.logo }
+    { key: 'logo', label: 'Logo', value: s.logo, type: 'image', folder: 'sponsors' }
   ], (vals) => {
     if (index !== undefined) {
       siteData.sponsors[index] = vals;
@@ -1337,7 +1413,7 @@ function showPresidentModal(index) {
     { key: 'name', label: 'Họ tên', value: p.name },
     { key: 'gen', label: 'Chủ nhiệm đời thứ mấy', value: p.gen },
     { key: 'term', label: 'Nhiệm kỳ (VD: 2023 - 2024)', value: p.term },
-    { key: 'photo', label: 'Ảnh URL', value: p.photo }
+    { key: 'photo', label: 'Ảnh Đại diện', value: p.photo, type: 'image', folder: 'members' }
   ], (vals) => {
     if (!siteData.presidents) siteData.presidents = [];
     if (index !== undefined) {
@@ -1354,7 +1430,7 @@ function showBenefitModal(index) {
   showModal(index !== undefined ? 'Sửa quyền lợi' : 'Thêm quyền lợi', [
     { key: 'title', label: 'Tiêu đề', value: b.title },
     { key: 'description', label: 'Mô tả', value: b.description, type: 'textarea' },
-    { key: 'image', label: 'Ảnh URL', value: b.image }
+    { key: 'image', label: 'Ảnh Minh họa', value: b.image, type: 'image', folder: 'general' }
   ], (vals) => {
     if (index !== undefined) {
       siteData.about.benefits.items[index] = vals;
@@ -1390,7 +1466,7 @@ function showGalleryModal(index) {
   const g = index !== undefined ? siteData.home.gallery.items[index] : {};
   showModal(index !== undefined ? 'Sửa ảnh' : 'Thêm ảnh', [
     { key: 'label', label: 'Nhãn', value: g.label },
-    { key: 'image', label: 'Image URL', value: g.image }
+    { key: 'image', label: 'Hình ảnh', value: g.image, type: 'image', folder: 'general' }
   ], (vals) => {
     if (index !== undefined) {
       siteData.home.gallery.items[index] = vals;
@@ -1421,7 +1497,7 @@ function showStatModal(index) {
 function showBannerModal(index) {
   const b = index !== undefined ? siteData.home.hero.banners[index] : {};
   showModal(index !== undefined ? 'Sửa banner' : 'Thêm banner', [
-    { key: 'bgImage', label: 'Hình nền (URL)', value: b.bgImage },
+    { key: 'bgImage', label: 'Hình nền Banner', value: b.bgImage, type: 'image', folder: 'general' },
     { key: 'link', label: 'Đường dẫn đích khi click', value: b.link }
   ], (vals) => {
     if (index !== undefined) {
@@ -1439,7 +1515,7 @@ function showEcoChannelModal(index) {
   const c = index !== undefined ? eco.channels[index] : {};
   showModal(index !== undefined ? 'Sửa kênh' : 'Thêm kênh truyền thông', [
     { key: 'name', label: 'Tên kênh', value: c.name },
-    { key: 'logo', label: 'Logo URL', value: c.logo },
+    { key: 'logo', label: 'Logo kênh', value: c.logo, type: 'image', folder: 'sponsors' },
     { key: 'followers', label: 'Số followers', value: c.followers },
     { key: 'url', label: 'Link kênh', value: c.url }
   ], (vals) => {
@@ -1457,7 +1533,7 @@ function showCollaboratorModal(index) {
   const c = index !== undefined ? siteData.collaborators[index] : {};
   showModal(index !== undefined ? 'Sửa' : 'Thêm người hợp tác', [
     { key: 'name', label: 'Tên', value: c.name },
-    { key: 'photo', label: 'Ảnh URL', value: c.photo }
+    { key: 'photo', label: 'Ảnh Đại diện/Logo', value: c.photo, type: 'image', folder: 'collaborators' }
   ], (vals) => {
     if (!siteData.collaborators) siteData.collaborators = [];
     if (index !== undefined) {
