@@ -67,7 +67,7 @@
               <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: capitalize; font-weight: 600; display: block; margin-bottom: 4px;">${p.category}</span>
               <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
               <span style="font-size: 0.85rem; color: var(--text-secondary);">${p.dateRange || p.monthYear || p.year}</span>
-              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.description || ''}</div>
+              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.subtitle || ''}</div>
             </div>
           </a>
         `).join('');
@@ -104,7 +104,7 @@
               <span style="font-size: 0.8rem; color: var(--gold-primary); text-transform: capitalize; font-weight: 600; display: block; margin-bottom: 4px;">${p.category}</span>
               <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">${p.title}</h4>
               <span style="font-size: 0.85rem; color: var(--text-secondary);">${p.dateRange || p.monthYear || p.year}</span>
-              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.description || ''}</div>
+              <div class="project-hover-desc" style="font-size: 0.8rem;">${p.subtitle || ''}</div>
             </div>
         </a>
       `).join('');
