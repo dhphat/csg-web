@@ -86,8 +86,8 @@
                   }
                   if (!d) return '';
                   const dp = d.split('-');
-                  const fmtD = dp.length === 3 ? \`\${dp[2]}/\${dp[1]}/\${dp[0]}\` : d;
-                  if (t) return \`\${t} - \${fmtD}\`;
+                  const fmtD = dp.length === 3 ? dp[2] + '/' + dp[1] + '/' + dp[0] : d;
+                  if (t) return t + ' - ' + fmtD;
                   return fmtD;
                 })()}
               </span>
