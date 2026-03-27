@@ -854,7 +854,7 @@ function handleAction(dataset) {
     }
 
     // Category (Chuyên mục) - adds with year='Chuyên mục'
-    case 'add-category': showCategoryModal(); break;
+    case 'add-category': showProjectAdvancedModal(undefined, true); break;
 
     // HoF Category edit/delete
     case 'edit-hof-cat': {
@@ -981,13 +981,13 @@ function showSimpleModal(title, value, onSave) {
   showModal(title, [{ key: 'value', label: 'Nội dung', value, type: 'text' }], (vals) => onSave(vals.value));
 }
 
-function showProjectAdvancedModal(index) {
+function showProjectAdvancedModal(index, forceCategory = false) {
   const p = index !== undefined ? siteData.projects[index] : {
-    id: 'new-project-' + Date.now(),
+    id: `new-${forceCategory ? 'category' : 'project'}-` + Date.now(),
     title: '',
     subtitle: '',
-    year: String(new Date().getFullYear()),
-    category: 'event',
+    year: forceCategory ? 'Chuyên mục' : String(new Date().getFullYear()),
+    category: forceCategory ? 'category' : 'event',
     image: '',
     banner: '',
     description: '',
@@ -999,6 +999,8 @@ function showProjectAdvancedModal(index) {
     ongoing: false
   };
 
+  const isCat = forceCategory || p.year === 'Chuyên mục';
+
   const overlay = document.createElement('div');
   overlay.className = 'admin-modal-overlay';
   
@@ -1008,13 +1010,18 @@ function showProjectAdvancedModal(index) {
   let currentStats = {...(p.stats || {})};
 
   const renderModalContent = () => {
-    const milestonesHtml = currentMilestones.map((m, i) => `
-      <div class="modal-list-item">
-        <input type="text" placeholder="Tên mốc" value="${esc(m.label)}" onchange="window._projModalUpdate('milestone', ${i}, 'label', this.value)" style="flex:1;">
-        <input type="text" placeholder="VD: 15:30 - 20/11/2026 hoặc 20/11/2026" value="${esc(m.date)}" oninput="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
+    const milestonesHtml = currentMilestones.map((m, i) => {
+      let d = m.date || ''; let t = m.time || '';
+      if(d.includes('T')) { const pt = d.split('T'); d = pt[0]; t = pt[1]; }
+      return `
+      <div class="modal-list-item" style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" placeholder="Tên mốc" value="${esc(m.label)}" onchange="window._projModalUpdate('milestone', ${i}, 'label', this.value)" style="flex:1; min-width: 100px;">
+        <input type="date" value="${esc(d)}" onchange="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="width: 140px; flex-shrink: 0;">
+        <input type="time" value="${esc(t)}" onchange="window._projModalUpdate('milestone', ${i}, 'time', this.value)" style="width: 110px; flex-shrink: 0;">
         <button class="btn-icon danger" onclick="window._projModalDelete('milestone', ${i})"><i class="fas fa-trash"></i></button>
       </div>
-    `).join('');
+      `;
+    }).join('');
 
     const linksHtml = currentLinks.map((l, i) => `
       <div class="modal-list-item">
@@ -1036,7 +1043,7 @@ function showProjectAdvancedModal(index) {
     overlay.innerHTML = `
       <div class="admin-modal wide">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
-          <h3 style="margin:0;">${index !== undefined ? 'Quản lý Dự án' : 'Thêm Dự án mới'}</h3>
+          <h3 style="margin:0;">${index !== undefined ? (isCat ? 'Quản lý chuyên mục' : 'Quản lý Dự án') : (isCat ? 'Thêm chuyên mục' : 'Thêm Dự án mới')}</h3>
           <button class="btn-icon" id="m-close" style="font-size:1.5rem;">&times;</button>
         </div>
         
@@ -1046,18 +1053,19 @@ function showProjectAdvancedModal(index) {
               <div class="form-group"><label>ID (slug)</label><input type="text" id="m-id" value="${esc(p.id)}"></div>
               <div class="form-group"><label>Thể loại</label><input type="text" id="m-cat" value="${esc(p.category)}"></div>
             </div>
-            <div class="form-group"><label>Tên dự án</label><input type="text" id="m-title" value="${esc(p.title)}"></div>
+            <div class="form-group"><label>${isCat ? 'Tên chuyên mục' : 'Tên dự án'}</label><input type="text" id="m-title" value="${esc(p.title)}"></div>
             <div class="form-group"><label>Mô tả ngắn</label><input type="text" id="m-subtitle" value="${esc(p.subtitle)}"></div>
-            <div class="form-row">
+            <div class="form-row" style="${isCat ? 'display:none;' : ''}">
               <div class="form-group"><label>Năm</label><input type="text" id="m-year" value="${esc(p.year)}"></div>
               <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:25px;white-space:nowrap;">
                 <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-feat" ${p.featured ? 'checked' : ''}> Nổi bật</label>
                 <label style="margin:0;cursor:pointer;display:flex;align-items:center;gap:6px;color:#ccc;text-transform:none;letter-spacing:0;"><input type="checkbox" id="m-ongoing" ${p.ongoing ? 'checked' : ''}> Đang diễn ra</label>
               </div>
             </div>
-            <div class="form-group"><label>Poster dự án</label>${imageUploadField(p.image, 'm-img', 'projects')}</div>
+            ${isCat ? `<input type="hidden" id="m-year" value="Chuyên mục"><input type="hidden" id="m-feat" value="false"><input type="hidden" id="m-ongoing" value="false">` : ''}
+            <div class="form-group"><label>${isCat ? 'Logo chuyên mục' : 'Poster dự án'}</label>${imageUploadField(p.image, 'm-img', 'projects')}</div>
             <div class="form-group"><label>Banner dự án</label>${imageUploadField(p.banner, 'm-banner', 'projects')}</div>
-            <div class="form-group"><label>Chi tiết dự án</label><textarea id="m-desc" style="min-height:300px; resize:vertical;">${esc(p.description)}</textarea></div>
+            <div class="form-group"><label>${isCat ? 'Chi tiết chuyên mục' : 'Chi tiết dự án'}</label><textarea id="m-desc" style="min-height:300px; resize:vertical;">${esc(p.description)}</textarea></div>
           </div>
 
           <div class="modal-dynamic-lists">
@@ -1067,7 +1075,7 @@ function showProjectAdvancedModal(index) {
             </div>
 
             <div class="modal-list-editor">
-              <div class="modal-list-title"><span>Liên kết dự án</span> <button class="btn-add" onclick="window._projModalAdd('link')" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-plus"></i> Thêm</button></div>
+              <div class="modal-list-title"><span>${isCat ? 'Liên kết chuyên mục' : 'Liên kết dự án'}</span> <button class="btn-add" onclick="window._projModalAdd('link')" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-plus"></i> Thêm</button></div>
               <div class="modal-list-items">${linksHtml || '<p style="color:#666;font-size:0.8rem;margin:0;">Chưa có liên kết</p>'}</div>
             </div>
 
@@ -1168,7 +1176,7 @@ function showProjectAdvancedModal(index) {
 
   window._projModalAdd = (type) => {
     syncDOMToP();
-    if (type === 'milestone') currentMilestones.push({label:'', date:''});
+    if (type === 'milestone') currentMilestones.push({label:'', date:'', time:''});
     if (type === 'link') currentLinks.push({label:'', url:''});
     if (type === 'stat') currentStats['Mới'] = '';
     renderModalContent();

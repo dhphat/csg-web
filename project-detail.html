@@ -76,11 +76,20 @@
             <div class="milestone-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
               <span style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;">${m.label}</span>
               <span style="color: var(--gold-primary); font-size: 1.1rem; font-weight: 700;">
-                ${m.date && m.date.includes('T') ? (() => {
-                  const d = new Date(m.date);
-                  if (isNaN(d)) return m.date;
-                  return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0') + ' - ' + d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
-                })() : m.date}
+                ${(() => {
+                  let d = m.date || '';
+                  let t = m.time || '';
+                  if (d.includes('T')) {
+                    const parts = d.split('T');
+                    d = parts[0];
+                    t = parts[1];
+                  }
+                  if (!d) return '';
+                  const dp = d.split('-');
+                  const fmtD = dp.length === 3 ? \`\${dp[2]}/\${dp[1]}/\${dp[0]}\` : d;
+                  if (t) return \`\${t} - \${fmtD}\`;
+                  return fmtD;
+                })()}
               </span>
             </div>
           `).join('')}
