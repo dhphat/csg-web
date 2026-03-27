@@ -1011,7 +1011,7 @@ function showProjectAdvancedModal(index) {
     const milestonesHtml = currentMilestones.map((m, i) => `
       <div class="modal-list-item">
         <input type="text" placeholder="Tên mốc" value="${esc(m.label)}" onchange="window._projModalUpdate('milestone', ${i}, 'label', this.value)" style="flex:1;">
-        <input type="datetime-local" value="${esc(m.date)}" onchange="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
+        <input type="text" placeholder="VD: 15:30 - 20/11/2026 hoặc 20/11/2026" value="${esc(m.date)}" oninput="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
         <button class="btn-icon danger" onclick="window._projModalDelete('milestone', ${i})"><i class="fas fa-trash"></i></button>
       </div>
     `).join('');
