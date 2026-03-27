@@ -83,7 +83,7 @@
           <section class="ongoing-projects section">
             <div class="container">
               <h2 class="section-title section-title-no-dot" style="font-size: 2rem; display: flex; align-items: center; gap: 12px;"><span class="live-dot"></span> Đang diễn ra</h2>
-              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
+              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); justify-content: center; gap: 24px;">
                 ${ongoingCards}
               </div>
             </div>
@@ -113,7 +113,7 @@
                 <h2 class="section-title" style="font-size: 2rem; margin-bottom: 0;">Dự án gần đây</h2>
                 <a href="/project" style="color: var(--text-secondary); font-size: 0.95rem; text-decoration: none; font-weight: 400; transition: color var(--transition-fast);" onmouseover="this.style.color='var(--gold-primary)'" onmouseout="this.style.color='var(--text-secondary)'">Xem tất cả dự án &nbsp;↗</a>
               </div>
-              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px;">
+              <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); justify-content: center; gap: 32px;">
                 ${recentCards}
               </div>
             </div>

@@ -1011,7 +1011,7 @@ function showProjectAdvancedModal(index) {
     const milestonesHtml = currentMilestones.map((m, i) => `
       <div class="modal-list-item">
         <input type="text" placeholder="Tên mốc" value="${esc(m.label)}" onchange="window._projModalUpdate('milestone', ${i}, 'label', this.value)" style="flex:1;">
-        <input type="text" placeholder="Thời gian" value="${esc(m.date)}" onchange="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
+        <input type="datetime-local" value="${esc(m.date)}" onchange="window._projModalUpdate('milestone', ${i}, 'date', this.value)" style="flex:1;">
         <button class="btn-icon danger" onclick="window._projModalDelete('milestone', ${i})"><i class="fas fa-trash"></i></button>
       </div>
     `).join('');
@@ -1084,6 +1084,22 @@ function showProjectAdvancedModal(index) {
         </div>
       </div>
     `;
+
+    if (index === undefined) {
+      overlay.querySelector('#m-title').addEventListener('input', (e) => {
+        let title = e.target.value.split(':')[0];
+        let slug = title.toLowerCase().normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-');
+        
+        const mId = overlay.querySelector('#m-id');
+        mId.value = slug;
+        mId.dispatchEvent(new Event('input', { bubbles: true })); // trigger dirty state
+      });
+    }
 
     const msBtn = overlay.querySelector('#m-save');
     overlay.querySelectorAll('input, select, textarea').forEach(el => {
