@@ -80,11 +80,11 @@
 
       main.innerHTML = `
         <!-- Hero -->
-        <section class="dept-hero">
+        <section class="dept-hero" ${dept.image ? `style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('${dept.image}') center/cover;"` : ''}>
           <div class="container">
             <a href="/about" class="btn-back"><i class="fas fa-arrow-left"></i> Về cóc</a>
             <h1 class="dept-hero-title">${dept.name.toUpperCase()}</h1>
-            <p class="dept-hero-desc">${dept.description || ''}</p>
+            <p class="dept-hero-desc" style="white-space: pre-wrap;">${dept.description || ''}</p>
             ${deptMembersHtml}
           </div>
         </section>

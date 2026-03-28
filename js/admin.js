@@ -1313,14 +1313,20 @@ function showDeptAdvancedModal(index) {
 
         <div class="modal-actions" style="margin-top:24px; padding-top:20px; border-top:1px solid #333; display:flex; justify-content:flex-end; gap:12px;">
           <button class="btn-secondary" id="d-cancel">Hủy</button>
-          <button class="btn-primary" id="d-save" style="padding:12px 40px; font-size:1rem;"><i class="fas fa-save"></i> LƯU THÔNG TIN BAN</button>
+          <button class="btn-primary" id="d-save" style="padding:12px 40px; font-size:1rem; opacity:0.5;" disabled><i class="fas fa-save"></i> LƯU THÔNG TIN BAN</button>
         </div>
       </div>
     `;
 
+    const dSave = overlay.querySelector('#d-save');
+    overlay.addEventListener('input', () => { dSave.disabled = false; dSave.style.opacity = '1'; });
+    overlay.addEventListener('change', () => { dSave.disabled = false; dSave.style.opacity = '1'; });
+
     overlay.querySelector('#d-cancel').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#d-close').onclick = () => { cleanup(); overlay.remove(); };
-    overlay.querySelector('#d-save').onclick = () => {
+    dSave.onclick = () => {
+      dSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+      dSave.disabled = true;
       syncDeptDOM();
       currentDept.description = overlay.querySelector('#d-desc').value;
       currentDept.subDepts = []; // Removed redundant field
@@ -1330,10 +1336,12 @@ function showDeptAdvancedModal(index) {
       } else {
         siteData.departments.push(currentDept);
       }
-      cleanup();
-      overlay.remove();
-      renderSection('departments');
-      showToast('Đã lưu thông tin ban thành công');
+      setTimeout(() => {
+        cleanup();
+        overlay.remove();
+        renderSection('departments');
+        showToast('Đã lưu thông tin ban thành công');
+      }, 400);
     };
   };
 
