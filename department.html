@@ -29,8 +29,11 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
-      const params = new URLSearchParams(window.location.search);
-      const deptId = params.get('id');
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      let deptId = new URLSearchParams(window.location.search).get('id');
+      if (!deptId && pathParts.includes('department') && pathParts.length >= 2) {
+          deptId = pathParts[pathParts.indexOf('department') + 1];
+      }
       const dept = DataManager.getDepartment(deptId);
       const main = document.getElementById('department-main');
 

@@ -49,7 +49,7 @@
       const deptsHtml = departments.map(dept => {
         const subDepts = (dept.subDepts || []).map(s => `<span class="dept-sub-tag">${s}</span>`).join('');
         return `
-          <a href="/department?id=${dept.id}" class="dept-row reveal">
+          <a href="/department/${dept.id}" class="dept-row reveal">
             <span class="dept-row-name">${dept.name}</span>
             <span class="dept-row-subs">${subDepts}</span>
             <i class="fas fa-chevron-right dept-row-arrow"></i>
