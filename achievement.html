@@ -53,12 +53,21 @@
 
       const renderEcosystem = () => {
         if (!mediaEcosystem.channels.length) return '';
+        const totalCount = mediaEcosystem.channels.reduce((sum, c) => {
+          let str = c.followers || '0';
+          let num = parseInt(str.replace(/\D/g, ''), 10) || 0;
+          if (str.toUpperCase().includes('K') && num < 10000) num *= 1000;
+          if (str.toUpperCase().includes('M') && num < 10000) num *= 1000000;
+          return sum + num;
+        }, 0);
+        const formattedTotal = totalCount.toLocaleString('vi-VN') + '+';
+        
         return `
           <div class="ecosystem-section">
             <h2 class="ecosystem-title reveal">HỆ SINH THÁI TRUYỀN THÔNG ĐA DẠNG</h2>
             <div class="ecosystem-grid">
               <div class="eco-total-card reveal">
-                <span class="number" data-target="${mediaEcosystem.totalFollowers.replace(/\D/g, '')}">${mediaEcosystem.totalFollowers}</span>
+                <span class="number" data-target="${totalCount}">${formattedTotal}</span>
                 <span class="label">Tổng cộng lượt theo dõi</span>
               </div>
               ${mediaEcosystem.channels.map(c => `

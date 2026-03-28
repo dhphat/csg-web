@@ -51,7 +51,7 @@ export function renderAchievements(siteData, esc) {
 
     <div class="admin-card" style="margin-top:24px;">
       <div class="admin-card-header">
-        <h3>Hệ sinh thái truyền thông (Tổng Follow: <input type="text" value="${esc(eco.totalFollowers)}" data-bind="mediaEcosystem.totalFollowers" style="width:100px;font-size:1rem;font-weight:bold;margin-left:8px;" />)</h3>
+        <h3>Hệ sinh thái truyền thông <span style="font-size:0.8rem; font-weight:normal; color:#aaa; margin-left:8px;">(Hệ thống tự động tính tổng)</span></h3>
         <button class="btn-add" data-action="add-eco-channel"><i class="fas fa-plus"></i> Thêm kênh</button>
       </div>
       <div class="admin-item-list">${ecoChannels}</div>
