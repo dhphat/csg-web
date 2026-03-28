@@ -8,7 +8,7 @@ import { uploadImage } from './supabase.js';
  * @param {string} folder - Storage folder name
  * @returns {string} HTML string
  */
-export function imageUploadField(currentUrl, fieldId, folder = 'general') {
+export function imageUploadField(currentUrl, fieldId, folder = 'general', suggestion = 'Tự động nén HD (Max 1920px)') {
   const preview = currentUrl ? `<img src="${currentUrl}" class="upload-preview-img" />` : '';
   return `
     <div class="image-upload-field" data-field-id="${fieldId}" data-folder="${folder}">
@@ -20,11 +20,49 @@ export function imageUploadField(currentUrl, fieldId, folder = 'general') {
         <button type="button" class="btn-upload" onclick="document.getElementById('file-${fieldId}').click()">
           <i class="fas fa-cloud-upload-alt"></i> ${currentUrl ? 'Đổi ảnh' : 'Chọn ảnh'}
         </button>
+        <div style="font-size:0.75rem; color:#888; margin-top:6px; margin-bottom:4px;">${suggestion}</div>
         ${currentUrl ? `<span class="upload-status" id="status-${fieldId}">Đã có ảnh</span>` : `<span class="upload-status" id="status-${fieldId}">Chưa có ảnh</span>`}
       </div>
       <input type="hidden" id="url-${fieldId}" value="${currentUrl || ''}" />
     </div>
   `;
+}
+
+function compressImage(file, maxWidth = 1920, maxHeight = 1080) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.match(/image.*/)) { resolve(file); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = width * ratio;
+          height = height * ratio;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = "#000"; // For transparent PNGs converted to JPEG
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(blob => {
+          if (!blob) { reject(new Error('Canvas empty')); return; }
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", { type: 'image/jpeg' });
+          if (file.size < compressedFile.size) resolve(file);
+          else resolve(compressedFile);
+        }, 'image/jpeg', 0.85); // Facebook-like 85% JPEG compression
+      };
+      img.onerror = err => reject(err);
+      img.src = ev.target.result;
+    };
+    reader.onerror = err => reject(err);
+    reader.readAsDataURL(file);
+  });
 }
 
 /**
@@ -59,8 +97,18 @@ export function bindUploadEvents() {
       };
       reader.readAsDataURL(file);
 
+      // Compress Image Before Upload
+      status.textContent = 'Đang nén ảnh (Tối ưu hóa)...';
+      let fileToUpload = file;
+      try {
+        if (file.size > 300 * 1024) { // Compress if > 300KB
+          fileToUpload = await compressImage(file);
+        }
+      } catch(e) { console.error('Compression failed', e); }
+
       // Upload to Supabase
-      const publicUrl = await uploadImage(file, folder);
+      status.textContent = 'Đang tải lên Supabase...';
+      const publicUrl = await uploadImage(fileToUpload, folder);
       
       if (publicUrl) {
         urlInput.value = publicUrl;

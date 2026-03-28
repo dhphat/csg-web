@@ -326,7 +326,7 @@ function renderDepartments() {
 
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3>Phòng Ban / Hội đồng (${siteData.departments.length})</h3>
+      <h3>Phòng Ban (${siteData.departments.length})</h3>
       <button class="btn-add" data-action="add-dept"><i class="fas fa-plus"></i> Thêm ban mới</button>
     </div>
     ${deptCards}
@@ -1326,6 +1326,14 @@ function showDeptAdvancedModal(index) {
     };
   };
 
+  const syncDeptDOM = () => {
+    if (!overlay.querySelector('#d-name')) return;
+    currentDept.id = overlay.querySelector('#d-id').value;
+    currentDept.name = overlay.querySelector('#d-name').value;
+    currentDept.image = getUploadedUrl('d-img') || currentDept.image;
+    currentDept.description = overlay.querySelector('#d-desc').value;
+  };
+
   const cleanup = () => {
     delete window._deptModalAddTeam;
     delete window._deptModalDeleteTeam;
@@ -1337,12 +1345,14 @@ function showDeptAdvancedModal(index) {
 
   // Helper bindings
   window._deptModalAddTeam = () => {
+    syncDeptDOM();
     if (!currentDept.teams) currentDept.teams = [];
     currentDept.teams.push({ name: 'Team mới', image: '', description: '', members: [] });
     renderModalContent();
   };
   window._deptModalDeleteTeam = (ti) => {
     if (confirm('Xóa team này?')) {
+      syncDeptDOM();
       currentDept.teams.splice(ti, 1);
       renderModalContent();
     }
@@ -1351,6 +1361,7 @@ function showDeptAdvancedModal(index) {
     currentDept.teams[ti][key] = val;
   };
   window._deptModalAddMember = (ti) => {
+    syncDeptDOM();
     if (!currentDept.teams[ti].members) currentDept.teams[ti].members = [];
     currentDept.teams[ti].members.push({ name: '', role: '' });
     renderModalContent();
@@ -1359,6 +1370,7 @@ function showDeptAdvancedModal(index) {
     currentDept.teams[ti].members[mi][key] = val;
   };
   window._deptModalDeleteMember = (ti, mi) => {
+    syncDeptDOM();
     currentDept.teams[ti].members.splice(mi, 1);
     renderModalContent();
   };
