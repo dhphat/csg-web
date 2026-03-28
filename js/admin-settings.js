@@ -78,7 +78,7 @@ export function renderAbout(siteData, esc) {
   const blocks = (a.blocks || []).map((b, i) => `
     <div class="admin-item">
       <div class="admin-item-info">
-        <div class="admin-item-title">${b.icon && b.icon.includes('/') ? `<img src="${b.icon}" style="width:16px;height:16px;object-fit:cover;margin-right:8px;border-radius:2px;vertical-align:middle;">` : `<i class="${b.icon}" style="margin-right:8px;color:var(--gold-primary);"></i>`} ${esc(b.title)}</div>
+        <div class="admin-item-title"><i class="${b.icon}" style="margin-right:8px;color:var(--gold-primary);"></i> ${esc(b.title)}</div>
         <div class="admin-item-sub">${esc(b.content).substring(0,60)}...</div>
       </div>
       <div class="admin-item-actions">
@@ -198,8 +198,9 @@ function showStatModal(index, siteData, showModal, renderSection) {
 
 function showAboutBlockModal(index, siteData, showModal, renderSection) {
   const b = index !== undefined ? siteData.about.blocks[index] : {};
+  const iconPreview = b.icon ? `<i class="${b.icon}" style="margin-right:8px;"></i>` : '';
   showModal(index !== undefined ? 'Sửa khối' : 'Thêm khối', [
-    { key: 'icon', label: 'Icon minh họa (Tải ảnh)', value: b.icon, type: 'image', folder: 'general' },
+    { key: 'icon', label: `Icon class ${iconPreview} (VD: fas fa-rocket, fas fa-university, fas fa-gem)`, value: b.icon },
     { key: 'title', label: 'Tiêu đề', value: b.title },
     { key: 'content', label: 'Nội dung', value: b.content, type: 'textarea' }
   ], (vals) => {

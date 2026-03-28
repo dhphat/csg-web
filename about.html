@@ -36,12 +36,8 @@
 
       // About info blocks
       const blocksHtml = (about.blocks || []).map(b => `
-        <div class="about-info-item reveal">
-          <div class="about-info-icon">
-            ${b.icon && b.icon.includes('/') 
-              ? `<img src="${b.icon}" style="width:24px; height:24px; object-fit:contain; filter: brightness(0) invert(1) hue-rotate(10deg) sepia(100%) saturate(1000%) brightness(1.2);" />` 
-              : `<i class="${b.icon}"></i>`}
-          </div>
+        <div class="about-info-block reveal">
+          <div class="about-info-icon"><i class="${b.icon}"></i></div>
           <div class="about-info-text">
             <h3>${b.title}</h3>
             <p style="white-space: pre-wrap;">${b.content}</p>
