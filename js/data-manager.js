@@ -218,15 +218,20 @@ const DataManager = {
 
     try {
       const replaceTable = async (table, rows) => {
-        await supabase.from(table).delete().not('id', 'is', null); 
+        const { error: delErr } = await supabase.from(table).delete().not('id', 'is', null);
+        if (delErr) throw new Error(`Delete ${table} failed: ` + delErr.message);
+        
         if (rows.length > 0) {
             for (let i = 0; i < rows.length; i += 500) {
-              await supabase.from(table).insert(rows.slice(i, i+500));
+              const { error: insErr } = await supabase.from(table).insert(rows.slice(i, i+500));
+              if (insErr) throw new Error(`Insert ${table} failed: ` + insErr.message);
             }
         }
       };
 
-      await supabase.from('csg_settings').upsert(settingsRows);
+      const { error: setErr } = await supabase.from('csg_settings').upsert(settingsRows);
+      if (setErr) throw new Error("Settings upsert failed: " + setErr.message);
+      
       await replaceTable('csg_projects', projectRows);
       await replaceTable('csg_awards', awardRows);
       await replaceTable('csg_collaborators', collabRows);
@@ -235,17 +240,27 @@ const DataManager = {
       await replaceTable('csg_hall_of_fame', hofRows);
 
       // Foreign keys: xóa con trước, cha sau
-      await supabase.from('csg_members').delete().not('id', 'is', null);
-      await supabase.from('csg_teams').delete().not('id', 'is', null);
-      await supabase.from('csg_departments').delete().not('id', 'is', null);
+      const { error: err1 } = await supabase.from('csg_members').delete().not('id', 'is', null);
+      if(err1) throw err1;
+      const { error: err2 } = await supabase.from('csg_teams').delete().not('id', 'is', null);
+      if(err2) throw err2;
+      const { error: err3 } = await supabase.from('csg_departments').delete().not('id', 'is', null);
+      if(err3) throw err3;
 
-      if (deptRows.length > 0) await supabase.from('csg_departments').insert(deptRows);
-      if (teamRows.length > 0) await supabase.from('csg_teams').insert(teamRows);
+      if (deptRows.length > 0) {
+        const { error } = await supabase.from('csg_departments').insert(deptRows);
+        if (error) throw new Error("Dept Insert: " + error.message);
+      }
+      if (teamRows.length > 0) {
+        const { error } = await supabase.from('csg_teams').insert(teamRows);
+        if (error) throw new Error("Team Insert: " + error.message);
+      }
       if (memberRows.length > 0) await replaceTable('csg_members', memberRows);
 
       return true;
     } catch (e) {
-      console.error('Save failed:', e);
+      console.error('Save failed details:', e);
+      alert('Đồng bộ lên Cloud THẤT BẠI: ' + (e.message || String(e)));
       return false;
     }
   },
