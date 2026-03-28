@@ -45,6 +45,18 @@
 
       document.title = `${dept.name} - Cóc Sài Gòn`;
 
+      // Build dept managers HTML
+      const deptMembersHtml = (dept.members && dept.members.length > 0) ? `
+        <div class="dept-managers" style="margin-top:32px; display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
+          ${dept.members.map(m => `
+            <div style="background:rgba(255,255,255,0.05); padding:16px 32px; border-radius:12px; border:1px solid rgba(255,222,33,0.2); min-width:220px; text-align:center; backdrop-filter:blur(10px);">
+              <div style="color:var(--gold-primary); font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">${m.role}</div>
+              <div style="color:#fff; font-size:1.15rem; font-weight:600;">${m.name}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '';
+
       // Build teams HTML
       const teamsHtml = (dept.teams || []).map((team, index) => `
         <div class="dept-team-block ${index % 2 === 0 ? '' : 'reverse'} reveal">
@@ -72,7 +84,8 @@
           <div class="container">
             <a href="/about" class="btn-back"><i class="fas fa-arrow-left"></i> Về cóc</a>
             <h1 class="dept-hero-title">${dept.name.toUpperCase()}</h1>
-            <p class="dept-hero-desc">${dept.description}</p>
+            <p class="dept-hero-desc">${dept.description || ''}</p>
+            ${deptMembersHtml}
           </div>
         </section>
 

@@ -1236,6 +1236,14 @@ function showDeptAdvancedModal(index) {
   let currentDept = JSON.parse(JSON.stringify(d));
 
   const renderModalContent = () => {
+    const deptMembersHtml = (currentDept.members || []).map((m, mi) => `
+      <div class="modal-member-item" style="margin-bottom:8px;">
+        <input type="text" placeholder="Tên (VD: Nguyễn Văn A)" value="${esc(m.name)}" onchange="window._deptModalUpdateDeptMember(${mi}, 'name', this.value)" style="flex:1;">
+        <input type="text" placeholder="Vai trò (VD: Trưởng ban)" value="${esc(m.role)}" onchange="window._deptModalUpdateDeptMember(${mi}, 'role', this.value)" style="flex:1;">
+        <button class="btn-icon danger" onclick="window._deptModalDeleteDeptMember(${mi})"><i class="fas fa-times"></i></button>
+      </div>
+    `).join('');
+
     const teamsHtml = (currentDept.teams || []).map((t, ti) => {
       const membersHtml = (t.members || []).map((m, mi) => `
         <div class="modal-member-item">
@@ -1255,11 +1263,11 @@ function showDeptAdvancedModal(index) {
           <button class="btn-icon danger" onclick="window._deptModalDeleteTeam(${ti})"><i class="fas fa-trash"></i></button>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Ảnh team (URL)</label><input type="text" value="${esc(t.image || '')}" onchange="window._deptModalUpdateTeam(${ti}, 'image', this.value)"></div>
+          <div class="form-group"><label>Ảnh team</label>${imageUploadField(t.image || '', 'd-team-img-'+ti, 'departments')}</div>
         </div>
         <div class="form-group"><label>Mô tả team</label><textarea onchange="window._deptModalUpdateTeam(${ti}, 'description', this.value)">${esc(t.description || '')}</textarea></div>
         <div style="margin-top:10px;">
-          <label style="font-size:0.75rem;color:#999;font-weight:700;margin-bottom:8px;display:block;">THÀNH VIÊN TEAM</label>
+          <label style="font-size:0.75rem;color:#999;font-weight:700;margin-bottom:8px;display:block;">QUẢN LÝ TEAM</label>
           ${membersHtml || '<p style="color:#666;font-size:0.8rem;margin-bottom:8px;">Chưa có thành viên</p>'}
           <button class="btn-add" onclick="window._deptModalAddMember(${ti})" style="font-size:0.7rem;padding:4px 8px;"><i class="fas fa-plus"></i> Thêm thành viên</button>
         </div>
@@ -1286,7 +1294,12 @@ function showDeptAdvancedModal(index) {
             </div>
             <div class="form-group">
               <label>Mô tả Ban</label>
-              <textarea id="d-desc" style="min-height:300px;">${esc(currentDept.description || '')}</textarea>
+              <textarea id="d-desc" style="min-height:200px;">${esc(currentDept.description || '')}</textarea>
+            </div>
+            <div class="form-group" style="margin-top:20px; border-top:1px solid #333; padding-top:20px;">
+              <div class="modal-list-title" style="margin-bottom:12px;"><span>QUẢN LÝ BAN</span></div>
+              ${deptMembersHtml || '<p style="color:#666;font-size:0.8rem;margin-bottom:8px;">Chưa có quản lý ban</p>'}
+              <button class="btn-add" onclick="window._deptModalAddDeptMember()" style="font-size:0.7rem;padding:8px;width:100%;justify-content:center;border-style:dashed;"><i class="fas fa-plus"></i> Thêm Quản lý Ban</button>
             </div>
           </div>
 
@@ -1308,9 +1321,7 @@ function showDeptAdvancedModal(index) {
     overlay.querySelector('#d-cancel').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#d-close').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#d-save').onclick = () => {
-      currentDept.id = overlay.querySelector('#d-id').value;
-      currentDept.name = overlay.querySelector('#d-name').value;
-      currentDept.image = getUploadedUrl('d-img');
+      syncDeptDOM();
       currentDept.description = overlay.querySelector('#d-desc').value;
       currentDept.subDepts = []; // Removed redundant field
 
@@ -1332,6 +1343,28 @@ function showDeptAdvancedModal(index) {
     currentDept.name = overlay.querySelector('#d-name').value;
     currentDept.image = getUploadedUrl('d-img') || currentDept.image;
     currentDept.description = overlay.querySelector('#d-desc').value;
+    
+    if (currentDept.teams) {
+      currentDept.teams.forEach((t, ti) => {
+        const teamImgUrl = getUploadedUrl('d-team-img-' + ti);
+        if (teamImgUrl) t.image = teamImgUrl;
+      });
+    }
+  };
+
+  window._deptModalAddDeptMember = () => {
+    syncDeptDOM();
+    if (!currentDept.members) currentDept.members = [];
+    currentDept.members.push({ name: '', role: '' });
+    renderModalContent();
+  };
+  window._deptModalUpdateDeptMember = (mi, key, val) => {
+    currentDept.members[mi][key] = val;
+  };
+  window._deptModalDeleteDeptMember = (mi) => {
+    syncDeptDOM();
+    currentDept.members.splice(mi, 1);
+    renderModalContent();
   };
 
   const cleanup = () => {
@@ -1341,6 +1374,9 @@ function showDeptAdvancedModal(index) {
     delete window._deptModalAddMember;
     delete window._deptModalUpdateMember;
     delete window._deptModalDeleteMember;
+    delete window._deptModalAddDeptMember;
+    delete window._deptModalUpdateDeptMember;
+    delete window._deptModalDeleteDeptMember;
   };
 
   // Helper bindings
