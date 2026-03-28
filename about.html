@@ -47,7 +47,7 @@
 
       // Departments list
       const deptsHtml = departments.map(dept => {
-        const subDepts = (dept.subDepts || []).map(s => `<span class="dept-sub-tag">${s}</span>`).join('');
+        const subDepts = (dept.teams || []).map(t => `<span class="dept-sub-tag">${t.name}</span>`).join('');
         return `
           <a href="/department/${dept.id}" class="dept-row reveal">
             <span class="dept-row-name">${dept.name}</span>
