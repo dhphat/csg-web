@@ -99,12 +99,15 @@ const DataManager = {
         if (departments) {
             def.departments = departments.map(d => {
                 const dTeams = (teams || []).filter(t => t.department_id === d.id).map(t => {
-                   const tMembers = (members || []).filter(m => m.team_id === t.id).map(m => ({
+                   const tMembers = (members || []).filter(m => m.team_id === t.id && m.type === 'team_member').map(m => ({
                        id: m.id, name: m.name, role: m.role, photo: m.photo
                    }));
                    return { ...t, members: tMembers };
                 });
-                return { ...d, teams: dTeams };
+                const dMembers = (members || []).filter(m => m.department_id === d.id && m.type === 'dept_member').map(m => ({
+                   id: m.id, name: m.name, role: m.role, photo: m.photo
+                }));
+                return { ...d, teams: dTeams, members: dMembers };
             });
         }
         
@@ -197,6 +200,9 @@ const DataManager = {
           (team.members || []).forEach(mem => {
              memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: mem.photo });
           });
+       });
+       (dept.members || []).forEach(mem => {
+          memberRows.push({ id: mem.id || uuidv4(), department_id: dId, type: 'dept_member', name: mem.name, role: mem.role, photo: mem.photo });
        });
     });
 
