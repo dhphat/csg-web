@@ -35,6 +35,7 @@
   line-height: 1.8;
   margin-bottom: 40px;
   max-width: 900px;
+  white-space: pre-wrap;
 }
 
 .about-info-grid {
