@@ -22,7 +22,7 @@ export function renderProjects(siteData, esc) {
         </div>
         <div class="admin-item-actions">
           <button class="btn-primary" data-action="edit-project" data-index="${idx}"><i class="fas fa-edit"></i> Quản lý Chuyên sâu</button>
-          <button class="btn-icon danger" data-action="delete-project" data-index="${idx}"><i class="fas fa-trash"></i> Xóa Dự Án</button>
+          <button class="btn-icon danger" data-action="delete-project" data-index="${idx}"><i class="fas fa-trash"></i></button>
         </div>
       </div>
     </div>

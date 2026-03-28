@@ -189,7 +189,7 @@ const DataManager = {
     const memberRows = [];
 
     (d.departments || []).forEach(dept => {
-       const dId = uuidv4();
+       const dId = dept.id || uuidv4();
        deptRows.push({ id: dId, name: dept.name, image: dept.image, description: dept.description });
        (dept.teams || []).forEach(team => {
           const tId = uuidv4();
