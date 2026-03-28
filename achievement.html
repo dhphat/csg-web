@@ -35,6 +35,7 @@
       const awards = data.awards || [];
       const projects = (data.projects || []).filter(p => p.stats && Object.keys(p.stats).length > 0);
       const collaborators = data.collaborators || [];
+      const sponsors = data.sponsors || [];
       const mediaEcosystem = data.mediaEcosystem || { channels: [] };
       const main = document.getElementById('achievement-main');
 
@@ -176,8 +177,7 @@
             <div class="container">
               <h2 class="sponsors-title" style="text-align: center;">NHÀ TÀI TRỢ VÀ ĐỐI TÁC</h2>
               <div class="sponsors-grid">
-                ${['KOTV','RuBy','Mons','MixiGaming','KAPINT','W Hotel','Heineken','H118','be','UNIACE','ImUnique']
-                  .map(s => `<div class="sponsor-item"><img src="https://via.placeholder.com/120x60/1a1a1a/f0f0f0?text=${s}" alt="${s}" /></div>`).join('')}
+                ${sponsors.map(s => `<div class="sponsor-item reveal"><img src="${s.logo}" alt="${s.name}" /></div>`).join('')}
               </div>
               ${renderCollaborators()}
             </div>

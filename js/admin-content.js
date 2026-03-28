@@ -59,11 +59,13 @@ export function renderAchievements(siteData, esc) {
 
     <div class="admin-card" style="margin-top:24px;">
       <div class="admin-card-header">
-        <h3>Đối tác phát triển / Đồng hành (${(siteData.collaborators||[]).length})</h3>
+        <h3>Đã hợp tác cùng (Cá nhân/Tổ chức) (${(siteData.collaborators||[]).length})</h3>
         <button class="btn-add" data-action="add-collaborator"><i class="fas fa-plus"></i> Thêm</button>
       </div>
       <div class="admin-item-list">${collabs}</div>
     </div>
+    
+    ${renderSponsors(siteData, esc)}
   `;
 }
 
@@ -82,9 +84,9 @@ export function renderSponsors(siteData, esc) {
   `).join('');
 
   return `
-    <div class="admin-card">
+    <div class="admin-card" style="margin-top:24px;">
       <div class="admin-card-header">
-        <h3>Nhà tài trợ (${siteData.sponsors.length})</h3>
+        <h3>Nhà tài trợ và Đối tác (${siteData.sponsors.length})</h3>
         <button class="btn-add" data-action="add-sponsor"><i class="fas fa-plus"></i> Thêm</button>
       </div>
       <div class="admin-item-list">${items}</div>
