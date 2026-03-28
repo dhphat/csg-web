@@ -59,7 +59,7 @@ export function renderAchievements(siteData, esc) {
 
     <div class="admin-card" style="margin-top:24px;">
       <div class="admin-card-header">
-        <h3>Đã hợp tác cùng (Cá nhân/Tổ chức) (${(siteData.collaborators||[]).length})</h3>
+        <h3>Đã hợp tác cùng (Cá nhân/Tập thể) (${(siteData.collaborators||[]).length})</h3>
         <button class="btn-add" data-action="add-collaborator"><i class="fas fa-plus"></i> Thêm</button>
       </div>
       <div class="admin-item-list">${collabs}</div>
@@ -203,7 +203,7 @@ export function handleContentAction(action, index, dataset, siteData, showModal,
     case 'add-sponsor': showSponsorModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-sponsor': showSponsorModal(index, siteData, showModal, renderSection); break;
     case 'delete-sponsor':
-      if (confirm('Xóa nhà tài trợ này?')) { siteData.sponsors.splice(index, 1); window.setDirty(true); renderSection('sponsors'); }
+      if (confirm('Xóa nhà tài trợ này?')) { siteData.sponsors.splice(index, 1); window.setDirty(true); renderSection('achievements'); }
       break;
       
     // HOF
@@ -323,7 +323,7 @@ function showSponsorModal(index, siteData, showModal, renderSection) {
     } else {
       siteData.sponsors.push(vals);
     }
-    renderSection('sponsors');
+    renderSection('achievements');
   });
 }
 

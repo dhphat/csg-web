@@ -74,6 +74,7 @@ export function handleProjectAction(action, index, dataset, siteData, showModal,
     case 'delete-project':
       if (confirm('Xóa hoàn toàn dự án/chuyên mục này?')) { 
         siteData.projects.splice(index, 1); 
+        window.setDirty(true);
         renderSection('projects'); 
       }
       break;
