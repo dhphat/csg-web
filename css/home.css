@@ -362,6 +362,11 @@
 }
 
 @media (max-width: 768px) {
+  .hero {
+    height: 50vw;
+    min-height: 220px;
+  }
+
   .hero-title {
     font-size: 1.8rem;
   }
