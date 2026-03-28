@@ -138,25 +138,25 @@ export function handleSettingsAction(action, index, siteData, showModal, renderS
     case 'add-banner': showBannerModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-banner': showBannerModal(index, siteData, showModal, renderSection); break;
     case 'delete-banner':
-      if(confirm('Xóa banner này?')) { siteData.home.hero.banners.splice(index, 1); renderSection('general'); }
+      if(confirm('Xóa banner này?')) { siteData.home.hero.banners.splice(index, 1); window.setDirty(true); renderSection('general'); }
       break;
 
     case 'add-stat': showStatModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-stat': showStatModal(index, siteData, showModal, renderSection); break;
     case 'delete-stat':
-      if(confirm('Xóa thông số này?')) { siteData.home.stats.items.splice(index, 1); renderSection('general'); }
+      if(confirm('Xóa thông số này?')) { siteData.home.stats.items.splice(index, 1); window.setDirty(true); renderSection('general'); }
       break;
 
     case 'add-about-block': showAboutBlockModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-about-block': showAboutBlockModal(index, siteData, showModal, renderSection); break;
     case 'delete-about-block':
-      if (confirm('Xóa khối thông tin này?')) { siteData.about.blocks.splice(index, 1); renderSection('about'); }
+      if (confirm('Xóa khối thông tin này?')) { siteData.about.blocks.splice(index, 1); window.setDirty(true); renderSection('about'); }
       break;
 
     case 'add-benefit': showBenefitModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-benefit': showBenefitModal(index, siteData, showModal, renderSection); break;
     case 'delete-benefit':
-      if (confirm('Xóa quyền lợi này?')) { siteData.about.benefits.items.splice(index, 1); renderSection('about'); }
+      if (confirm('Xóa quyền lợi này?')) { siteData.about.benefits.items.splice(index, 1); window.setDirty(true); renderSection('about'); }
       break;
       
     // Footer dynamic arrays if exist (was gallery but gallery removed in HTML? Let's leave handle if any)

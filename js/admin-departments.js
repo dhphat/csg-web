@@ -35,7 +35,7 @@ export function handleDeptAction(action, index, siteData, renderSection) {
     case 'add-dept': showDeptAdvancedModal(undefined, siteData, renderSection); break;
     case 'edit-dept': showDeptAdvancedModal(index, siteData, renderSection); break;
     case 'delete-dept':
-      if (confirm('Xóa phòng ban này và toàn bộ dữ liệu team bên trong?')) { siteData.departments.splice(index, 1); renderSection('departments'); }
+      if (confirm('Xóa phòng ban này và toàn bộ dữ liệu team bên trong?')) { siteData.departments.splice(index, 1); window.setDirty(true); renderSection('departments'); }
       break;
   }
 }

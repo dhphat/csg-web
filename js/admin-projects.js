@@ -83,7 +83,7 @@ export function handleProjectAction(action, index, dataset, siteData, showModal,
     case 'add-milestone': showMilestoneModal(index, undefined, siteData, showModal, renderSection); break;
     case 'edit-milestone': showMilestoneModal(index, dataset.year, siteData, showModal, renderSection); break;
     case 'delete-milestone':
-      if (confirm('Xóa mốc này?')) { siteData.projects[index].milestones.splice(dataset.year, 1); renderSection('projects'); }
+      if (confirm('Xóa mốc này?')) { siteData.projects[index].milestones.splice(dataset.year, 1); window.setDirty(true); renderSection('projects'); }
       break;
 
     case 'add-link': showLinkModal(index, undefined, siteData, showModal, renderSection); break;

@@ -183,25 +183,25 @@ export function handleContentAction(action, index, dataset, siteData, showModal,
     case 'add-award': showAwardModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-award': showAwardModal(index, siteData, showModal, renderSection); break;
     case 'delete-award':
-      if (confirm('Xóa giải thưởng này?')) { siteData.awards.splice(index, 1); renderSection('achievements'); }
+      if (confirm('Xóa giải thưởng này?')) { siteData.awards.splice(index, 1); window.setDirty(true); renderSection('achievements'); }
       break;
 
     case 'add-eco-channel': showEcoChannelModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-eco-channel': showEcoChannelModal(index, siteData, showModal, renderSection); break;
     case 'delete-eco-channel':
-      if (confirm('Xóa kênh truyền thông này?')) { siteData.mediaEcosystem.channels.splice(index, 1); renderSection('achievements'); }
+      if (confirm('Xóa kênh truyền thông này?')) { siteData.mediaEcosystem.channels.splice(index, 1); window.setDirty(true); renderSection('achievements'); }
       break;
 
     case 'add-collaborator': showCollaboratorModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-collaborator': showCollaboratorModal(index, siteData, showModal, renderSection); break;
     case 'delete-collaborator':
-      if (confirm('Xóa đối tác này?')) { siteData.collaborators.splice(index, 1); renderSection('achievements'); }
+      if (confirm('Xóa đối tác này?')) { siteData.collaborators.splice(index, 1); window.setDirty(true); renderSection('achievements'); }
       break;
 
     case 'add-sponsor': showSponsorModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-sponsor': showSponsorModal(index, siteData, showModal, renderSection); break;
     case 'delete-sponsor':
-      if (confirm('Xóa nhà tài trợ này?')) { siteData.sponsors.splice(index, 1); renderSection('sponsors'); }
+      if (confirm('Xóa nhà tài trợ này?')) { siteData.sponsors.splice(index, 1); window.setDirty(true); renderSection('sponsors'); }
       break;
       
     // HOF

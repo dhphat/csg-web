@@ -76,13 +76,13 @@ export function handleMemberAction(action, index, siteData, showModal, renderSec
     case 'add-president': showPresidentModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-president': showPresidentModal(index, siteData, showModal, renderSection); break;
     case 'delete-president':
-      if (confirm('Xóa chủ nhiệm này?')) { siteData.presidents.splice(index, 1); renderSection('members'); }
+      if (confirm('Xóa chủ nhiệm này?')) { siteData.presidents.splice(index, 1); window.setDirty(true); renderSection('members'); }
       break;
 
     case 'add-board-member': showMemberModal(null, 0, siteData, showModal, renderSection); break;
     case 'edit-board-member': showMemberModal(index, 0, siteData, showModal, renderSection); break;
     case 'delete-board-member':
-      if (confirm('Xóa thành viên này?')) { siteData.boardGenerations[0].members.splice(index, 1); renderSection('members'); }
+      if (confirm('Xóa thành viên này?')) { siteData.boardGenerations[0].members.splice(index, 1); window.setDirty(true); renderSection('members'); }
       break;
   }
 }
