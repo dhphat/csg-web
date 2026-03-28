@@ -19,9 +19,11 @@
 }
 
 .award-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end; /* Align bottom to keep text horizontally aligned if heights vary on mobile */
+  gap: 24px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -43,9 +45,10 @@
 }
 
 .award-card img {
-  width: 100%;
-  aspect-ratio: 4/5;
-  object-fit: cover;
+  height: 260px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
   border-radius: var(--radius-md);
   margin-bottom: 12px;
   border: 1px solid var(--border-color);
@@ -401,7 +404,11 @@
 /* Responsive */
 @media (max-width: 768px) {
   .award-grid {
-    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .award-card img {
+    height: 180px;
   }
 
   .award-hero-title {
