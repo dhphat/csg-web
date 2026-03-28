@@ -3,8 +3,10 @@
 /* Hero Section */
 .hero {
   position: relative;
-  height: 60vh;
-  min-height: 480px;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  min-height: 220px;
+  max-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -362,11 +364,6 @@
 }
 
 @media (max-width: 768px) {
-  .hero {
-    height: 50vw;
-    min-height: 220px;
-  }
-
   .hero-title {
     font-size: 1.8rem;
   }
