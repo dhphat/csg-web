@@ -136,6 +136,15 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
   let currentLinks = [...(p.links || [])].map(l => typeof l === 'string' ? {label: 'Liên kết', url: l} : l);
   let currentStats = {...(p.stats || {})};
 
+  let currentId = p.id;
+  let currentTitle = p.title;
+  let currentSubtitle = p.subtitle || '';
+  let currentImage = p.image || '';
+  let currentBanner = p.banner || '';
+  let currentFeatured = p.featured;
+  let currentOngoing = p.ongoing;
+  let currentDesc = p.description || '';
+
   const renderModalContent = () => {
     const esc = (str) => {
       if (!str) return '';
@@ -183,30 +192,30 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
           <!-- CỘT TRÁI: THÔNG TIN CƠ BẢN -->
           <div class="modal-basic-info" style="flex:1;">
             <div class="form-row">
-              <div class="form-group"><label>Mã ID (Slug URL)</label><input type="text" id="pm-id" value="${esc(p.id)}"></div>
-              <div class="form-group" style="flex:2;"><label>Tên ${isCat ? 'Chuyên mục' : 'Dự án'}</label><input type="text" id="pm-title" value="${esc(p.title)}"></div>
+              <div class="form-group"><label>Mã ID (Slug URL)</label><input type="text" id="pm-id" value="${esc(currentId)}"></div>
+              <div class="form-group" style="flex:2;"><label>Tên ${isCat ? 'Chuyên mục' : 'Dự án'}</label><input type="text" id="pm-title" value="${esc(currentTitle)}"></div>
             </div>
             
             <div class="form-row">
-              <div class="form-group"><label>Subtitle (Dòng phụ)</label><input type="text" id="pm-subtitle" value="${esc(p.subtitle || '')}"></div>
+              <div class="form-group"><label>Subtitle (Dòng phụ)</label><input type="text" id="pm-subtitle" value="${esc(currentSubtitle)}"></div>
             </div>
 
             <div class="form-group">
               <label>${isCat ? 'Logo chuyên mục' : 'Poster dự án'}</label>
-              ${imageUploadField(p.image || '', 'pm-img', 'projects')}
+              ${imageUploadField(currentImage, 'pm-img', 'projects')}
             </div>
             <div class="form-group">
               <label>Ảnh bìa trang chi tiết</label>
-              ${imageUploadField(p.banner || '', 'pm-banner', 'projects')}
+              ${imageUploadField(currentBanner, 'pm-banner', 'projects')}
             </div>
             ${!isCat ? `
             <div class="form-row">
-              <div class="form-group"><label><input type="checkbox" id="pm-featured" ${p.featured ? 'checked' : ''}> Đánh dấu Nổi Bật</label></div>
-              <div class="form-group"><label><input type="checkbox" id="pm-ongoing" ${p.ongoing ? 'checked' : ''}> Đang diễn ra</label></div>
+              <div class="form-group"><label><input type="checkbox" id="pm-featured" ${currentFeatured ? 'checked' : ''}> Đánh dấu Nổi Bật</label></div>
+              <div class="form-group"><label><input type="checkbox" id="pm-ongoing" ${currentOngoing ? 'checked' : ''}> Đang diễn ra</label></div>
             </div>` : ''}
             <div class="form-group">
               <label>Chi tiết ${isCat ? 'Chuyên mục' : 'Dự án'}</label>
-              <textarea id="pm-desc" style="min-height:120px;">${esc(p.description || '')}</textarea>
+              <textarea id="pm-desc" style="min-height:120px;">${esc(currentDesc)}</textarea>
             </div>
           </div>
 
@@ -299,6 +308,25 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
   };
 
   const syncDOM = () => {
+    // Sync basic info fields
+    const elId = overlay.querySelector('#pm-id');
+    const elTitle = overlay.querySelector('#pm-title');
+    const elSubtitle = overlay.querySelector('#pm-subtitle');
+    const elDesc = overlay.querySelector('#pm-desc');
+    const elFeatured = overlay.querySelector('#pm-featured');
+    const elOngoing = overlay.querySelector('#pm-ongoing');
+    const elImgUrl = overlay.querySelector('#url-pm-img');
+    const elBannerUrl = overlay.querySelector('#url-pm-banner');
+
+    if (elId) currentId = elId.value;
+    if (elTitle) currentTitle = elTitle.value;
+    if (elSubtitle) currentSubtitle = elSubtitle.value;
+    if (elDesc) currentDesc = elDesc.value;
+    if (elFeatured) currentFeatured = elFeatured.checked;
+    if (elOngoing) currentOngoing = elOngoing.checked;
+    if (elImgUrl) currentImage = elImgUrl.value;
+    if (elBannerUrl) currentBanner = elBannerUrl.value;
+
     // Keep local states updated before re-render
     const keys = Object.keys(currentStats);
     keys.forEach((k, i) => {
