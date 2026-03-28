@@ -60,7 +60,7 @@ const Renderer = {
     // Lists
     const deptsHtml = (data.departments || []).map(d => `<li><a href="/department/${d.id}" class="footer-subtle-link">${d.name}</a></li>`).join('');
     const projectsHtml = (data.projects || []).filter(p => p.year !== 'Chuyên mục').slice(0, 6).map(p => `<li><a href="/project/${p.id}" class="footer-subtle-link">${p.title}</a></li>`).join('');
-    const categoriesHtml = (data.projectCategories || []).map(c => `<li><a href="/project?category=${c.id}" class="footer-subtle-link">${c.name}</a></li>`).join('');
+    const categoriesHtml = (data.projectCategories || []).map(c => `<li><a href="/project/${c.id}" class="footer-subtle-link">${c.name}</a></li>`).join('');
 
     footer.innerHTML = `
       <div class="container">
