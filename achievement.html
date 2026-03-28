@@ -53,13 +53,22 @@
 
       const renderEcosystem = () => {
         if (!mediaEcosystem.channels.length) return '';
-        const totalCount = mediaEcosystem.channels.reduce((sum, c) => {
-          let str = c.followers || '0';
-          let num = parseInt(str.replace(/\D/g, ''), 10) || 0;
-          if (str.toUpperCase().includes('K') && num < 10000) num *= 1000;
-          if (str.toUpperCase().includes('M') && num < 10000) num *= 1000000;
-          return sum + num;
-        }, 0);
+        
+        const parseFollowers = (str) => {
+          if (!str) return 0;
+          str = String(str).toUpperCase().trim();
+          if (str.includes('K')) {
+            let val = parseFloat(str.replace('K','').replace(',','.'));
+            return isNaN(val) ? 0 : val * 1000;
+          }
+          if (str.includes('M')) {
+            let val = parseFloat(str.replace('M','').replace(',','.'));
+            return isNaN(val) ? 0 : val * 1000000;
+          }
+          return parseInt(str.replace(/\D/g, ''), 10) || 0;
+        };
+
+        const totalCount = mediaEcosystem.channels.reduce((sum, c) => sum + parseFollowers(c.followers), 0);
         const formattedTotal = totalCount.toLocaleString('vi-VN') + '+';
         
         return `
@@ -77,7 +86,7 @@
                   </div>
                   <div class="eco-channel-info">
                     <span class="eco-channel-name">${c.name}</span>
-                    <span class="eco-channel-followers">${c.followers}</span>
+                    <span class="eco-channel-followers">${parseFollowers(c.followers).toLocaleString('vi-VN')}</span>
                   </div>
                 </a>
               `).join('')}
