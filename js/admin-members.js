@@ -19,7 +19,7 @@ export function renderMembers(siteData, esc) {
     siteData.boardGenerations = [{ term: 'Hiện tại', members: [] }];
   }
   const currentGen = siteData.boardGenerations[0];
-  
+
   // Group members by level
   const membersByLevel = {};
   (currentGen.members || []).forEach(m => {
@@ -55,7 +55,7 @@ export function renderMembers(siteData, esc) {
   return `
     <div class="admin-card">
       <div class="admin-card-header">
-        <h3>Chủ nhiệm qua các thời kỳ (${(siteData.presidents||[]).length})</h3>
+        <h3>Chủ nhiệm qua các thời kỳ (${(siteData.presidents || []).length})</h3>
         <button class="btn-add" data-action="add-president"><i class="fas fa-plus"></i> Thêm</button>
       </div>
       <div class="admin-item-list">${presidents}</div>
@@ -63,7 +63,7 @@ export function renderMembers(siteData, esc) {
     
     <div class="admin-card" style="margin-top:32px;">
       <div class="admin-card-header">
-        <h3 style="color:var(--text-gold);">Ban chủ nhiệm hiện tại (${currentGen.members.length})</h3>
+        <h3 style="color:var(--text-gold);">Ban điều hành hiện tại (${currentGen.members.length})</h3>
         <button class="btn-add" data-action="add-board-member"><i class="fas fa-plus"></i> Thêm Thành viên</button>
       </div>
       <div class="admin-item-list" style="border-top:1px solid #333;">${groupedHtml || '<p style="padding:16px;color:#666;">Chưa có thành viên nào</p>'}</div>

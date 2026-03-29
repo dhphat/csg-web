@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,6 +15,7 @@
   <link rel="stylesheet" href="/css/member.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
+
 <body>
 
   <header class="site-header" id="header"></header>
@@ -69,7 +71,7 @@
 
       const boardTitleHtml = `
         <div class="container" style="padding: 40px 0 20px;">
-           <h2 class="section-title section-title-center reveal" style="font-size: 2rem; color: var(--gold-primary); text-transform: uppercase;">Ban chủ nhiệm hiện tại</h2>
+           <h2 class="section-title section-title-center reveal" style="font-size: 2rem; color: var(--gold-primary); text-transform: uppercase;">Ban điều hành hiện tại</h2>
         </div>
       `;
 
@@ -84,7 +86,7 @@
       if (boardGen.length > 0 && boardGen[0].members) {
         currentGenMembers = boardGen[0].members;
       }
-      
+
       const membersByLevel = {};
       currentGenMembers.forEach(m => {
         const lv = m.level || 1;
@@ -92,14 +94,14 @@
         membersByLevel[lv].push(m);
       });
 
-      const sortedLevels = Object.keys(membersByLevel).map(Number).sort((a,b) => b-a);
+      const sortedLevels = Object.keys(membersByLevel).map(Number).sort((a, b) => b - a);
 
       sortedLevels.forEach((lv, index) => {
         const members = membersByLevel[lv];
         if (!members || members.length === 0) return;
-        
+
         const dotColor = colors[index % colors.length];
-        
+
         genHtml += `
           <!-- Generation Row -->
           <div class="timeline-row reveal" style="position: relative; display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 70px; z-index: 5;">
@@ -118,7 +120,7 @@
           </div>
         `;
       });
-      
+
       genHtml += `</div>`; // Close container
 
       main.innerHTML = heroHtml + presidentsHtml + boardTitleHtml + genHtml;
@@ -139,4 +141,5 @@
     });
   </script>
 </body>
+
 </html>
