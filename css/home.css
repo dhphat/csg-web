@@ -434,4 +434,11 @@
   .ongoing-projects .project-card-home h4 {
     font-size: 0.95rem !important;
   }
+  
+  #hero-marquee {
+    padding: 6px 0 !important;
+  }
+  #hero-marquee .marquee-content {
+    font-size: 0.9rem !important;
+  }
 }

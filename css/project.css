@@ -210,14 +210,18 @@
     width: 220px;
   }
   
-  .project-card-info h4, .featured-card-info h4 {
-    font-size: 0.85rem !important;
+  .project-card-info h4, .featured-card-info h4, .project-card h4 {
+    font-size: 0.8rem !important;
     white-space: normal !important;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.3 !important;
+  }
+  .project-card-info p, .featured-card-info p, .project-card .project-hover-desc {
+    font-size: 0.65rem !important;
   }
 }
 
