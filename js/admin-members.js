@@ -93,7 +93,7 @@ function showPresidentModal(index, siteData, showModal, renderSection) {
     { key: 'name', label: 'Họ tên', value: p.name },
     { key: 'gen', label: 'Chủ nhiệm đời thứ mấy', value: p.gen },
     { key: 'term', label: 'Nhiệm kỳ (VD: 2023 - 2024)', value: p.term },
-    { key: 'photo', label: 'Ảnh Đại diện', value: p.photo, type: 'image', folder: 'members' }
+    { key: 'photo', label: 'Ảnh Đại diện', value: p.photo, type: 'image', folder: 'members', crop: '1:1' }
   ], (vals) => {
     if (!siteData.presidents) siteData.presidents = [];
     if (index !== undefined) {
@@ -111,7 +111,7 @@ function showMemberModal(index, yearIndex, siteData, showModal, renderSection) {
     { key: 'name', label: 'Họ tên', value: m.name },
     { key: 'role', label: 'Vai trò', value: m.role },
     { key: 'level', label: 'Cấp độ (1: Thành viên -> 5: Cao nhất)', value: m.level?.toString() || '1', type: 'number' },
-    { key: 'photo', label: 'Ảnh Đại diện', value: m.photo, type: 'image', folder: 'members' }
+    { key: 'photo', label: 'Ảnh Đại diện', value: m.photo, type: 'image', folder: 'members', crop: '1:1' }
   ], (vals) => {
     const member = { ...m, name: vals.name, role: vals.role, level: parseInt(vals.level) || 1, photo: vals.photo };
     if (index !== null) siteData.boardGenerations[yearIndex].members[index] = member;

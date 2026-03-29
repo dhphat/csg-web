@@ -13,7 +13,7 @@ export function showModal(title, fields, onSave, onRenderContent) {
       return `<div class="form-group"><label><input type="checkbox" id="modal-${f.key}" ${f.value ? 'checked' : ''} /> ${f.label}</label></div>`;
     }
     if (f.type === 'image') {
-      return `<div class="form-group"><label>${f.label}</label>${imageUploadField(f.value || '', 'modal-'+f.key, f.folder || 'general')}</div>`;
+      return `<div class="form-group"><label>${f.label}</label>${imageUploadField(f.value || '', 'modal-'+f.key, f.folder || 'general', undefined, f.crop)}</div>`;
     }
     return `<div class="form-group"><label>${f.label}</label><input type="${f.type || 'text'}" id="modal-${f.key}" value="${esc(f.value || '')}" /></div>`;
   }).join('');
