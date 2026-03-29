@@ -436,9 +436,12 @@
   }
   
   #hero-marquee {
-    padding: 6px 0 !important;
+    padding: 2px 0 !important;
+    border-bottom: 1px solid #000 !important;
   }
   #hero-marquee .marquee-content {
-    font-size: 0.9rem !important;
+    font-size: 0.55rem !important;
+    font-weight: 700 !important;
+    line-height: normal !important;
   }
 }
