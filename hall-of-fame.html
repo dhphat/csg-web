@@ -61,11 +61,7 @@
       let currentSubTab = 'yearly'; // 'yearly' or 'semesters'
       let currentSemester = 'ALL';
 
-      // Gather distinct semesters across all tabs
-      const allSemesters = new Set();
-      if(hallOfFame.individuals.semesters) hallOfFame.individuals.semesters.forEach(s => allSemesters.add(s.semester));
-      if(hallOfFame.collectives.semesters) hallOfFame.collectives.semesters.forEach(s => allSemesters.add(s.semester));
-      const semestersArray = Array.from(allSemesters);
+      // Distinct semesters are gathered per tab below
 
       const renderContent = () => {
         let cardsHtml = '';
@@ -83,10 +79,15 @@
           }
         } else {
           // Semesters
-          if (semestersArray.length > 0) {
+          let currentSemestersArray = [];
+          if (dataSrc && dataSrc.semesters) {
+            currentSemestersArray = Array.from(new Set(dataSrc.semesters.map(s => s.semester)));
+          }
+
+          if (currentSemestersArray.length > 0) {
             let filterButtons = `<button class="filter-btn ${currentSemester === 'ALL' ? 'active' : ''}" data-sem="ALL" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">Tất cả học kỳ</button>`;
             
-            semestersArray.forEach(sem => {
+            currentSemestersArray.forEach(sem => {
               filterButtons += `<button class="filter-btn ${currentSemester === sem ? 'active' : ''}" data-sem="${sem}" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === sem ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">${sem}</button>`;
             });
 

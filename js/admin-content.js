@@ -138,6 +138,7 @@ export function renderHallOfFame(siteData, esc, showSimpleModal) {
             <h4 style="margin:0;font-size:1.1rem;">${label} ${esc(periodTitle)}</h4>
             <div>
               <button class="btn-add" data-action="add-hof-cat" data-type="${type}" data-period="${period}" data-year="${index}" style="font-size:0.7rem;padding:4px 8px;"><i class="fas fa-plus"></i> Thêm Danh hiệu</button>
+              <button class="btn-icon" data-action="edit-hof-period" data-type="${type}" data-period="${period}" data-year="${index}" title="Sửa tên ${label}"><i class="fas fa-pen"></i></button>
               <button class="btn-icon danger" data-action="delete-hof-period" data-type="${type}" data-period="${period}" data-year="${index}"><i class="fas fa-trash"></i></button>
             </div>
           </div>
@@ -211,6 +212,18 @@ export function handleContentAction(action, index, dataset, siteData, showModal,
       const { type, period } = dataset;
       showSimpleModal('Nhập tên ' + (period === 'yearly' ? 'Năm (VD: 2024)' : 'Học kỳ (VD: Spring 2024)'), '', (val) => {
         siteData.hallOfFame[type][period].unshift({ [period==='yearly'?'year':'semester']: val, categories: [] });
+        renderSection('halloffame');
+      });
+      break;
+    }
+    case 'edit-hof-period': {
+      const { type, period, year: yi } = dataset;
+      const periodObj = siteData.hallOfFame[type][period][parseInt(yi)];
+      const currentVal = period === 'yearly' ? periodObj.year : periodObj.semester;
+      showSimpleModal('Sửa tên ' + (period === 'yearly' ? 'Năm' : 'Học kỳ'), currentVal || '', (val) => {
+        if (period === 'yearly') periodObj.year = val;
+        else periodObj.semester = val;
+        if (window.setDirty) window.setDirty(true);
         renderSection('halloffame');
       });
       break;
