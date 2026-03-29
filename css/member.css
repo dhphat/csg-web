@@ -150,16 +150,24 @@
     font-size: 1.5rem !important;
     margin-bottom: 40px !important;
   }
+  .presidents-grid {
+    gap: 12px !important;
+  }
   .v2-member-card-president {
-    width: calc(33.333% - 16px) !important;
+    width: calc(33.333% - 8px) !important;
     min-width: unset !important;
-    padding: 40px 10px 16px !important;
+    padding: 30px 4px 12px !important;
   }
   .v2-member-card-president .v2-member-name {
-    font-size: 0.85rem !important;
+    font-size: 0.75rem !important;
+    margin-bottom: 4px !important;
   }
   .v2-member-card-president .v2-member-role {
-    font-size: 0.7rem !important;
+    font-size: 0.65rem !important;
+    margin-bottom: 2px !important;
+  }
+  .v2-member-card-president .v2-member-term {
+    font-size: 0.6rem !important;
   }
   .v2-member-card-board {
     width: calc(50% - 12px) !important;
@@ -178,12 +186,21 @@
 
 @media (max-width: 480px) {
   .v2-member-card-president {
-    width: calc(33.333% - 10px) !important;
-    padding: 30px 8px 12px !important;
+    width: calc(33.333% - 8px) !important;
+    padding: 24px 4px 10px !important;
   }
   .v2-member-card-president .v2-member-avatar {
-    width: 50px !important;
-    height: 50px !important;
-    top: -25px !important;
+    width: 40px !important;
+    height: 40px !important;
+    top: -20px !important;
+  }
+  .v2-member-card-president .v2-member-name {
+    font-size: 0.7rem !important;
+  }
+  .v2-member-card-president .v2-member-role {
+    font-size: 0.6rem !important;
+  }
+  .v2-member-card-president .v2-member-term {
+    font-size: 0.55rem !important;
   }
 }

@@ -102,17 +102,19 @@
 
   /* Manager Box Overrides */
   .dept-managers {
-    gap: 12px !important;
+    gap: 8px !important;
   }
   .dept-manager-card {
-    min-width: calc(50% - 6px) !important;
-    padding: 12px !important;
+    min-width: calc(50% - 4px) !important;
+    padding: 10px 8px !important;
+    border-radius: 8px !important;
   }
   .dept-manager-role {
-    font-size: 0.7rem !important;
-    letter-spacing: 1px !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
   }
   .dept-manager-name {
-    font-size: 0.95rem !important;
+    font-size: 0.85rem !important;
   }
 }
