@@ -88,12 +88,16 @@
           }
 
           if (currentYearsArray.length > 0 || currentCategoriesArray.length > 0) {
-            let categoryFilterHtml = `<select class="dropdown-filter" data-filter="category" style="padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentCategory !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; outline: none; cursor: pointer; min-width: 200px; appearance: auto;">
+            const arrowSvgCat = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='${currentCategory !== 'ALL' ? '%23ffde21' : '%23a0a0a0'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>`;
+            
+            let categoryFilterHtml = `<select class="dropdown-filter" data-filter="category" style="padding: 8px 40px 8px 20px; border-radius: var(--radius-full); border: 1px solid ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background-color: ${currentCategory !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; background-image: url('${arrowSvgCat}'); background-repeat: no-repeat; background-position: right 16px center; color: ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 220px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
               <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả danh hiệu</option>
               ${currentCategoriesArray.map(c => `<option value="${c}" style="background: #1a1a1a; color: #fff;" ${currentCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
             </select>`;
 
-            let yearFilterHtml = `<select class="dropdown-filter" data-filter="year" style="padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentYear !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; outline: none; cursor: pointer; min-width: 150px; appearance: auto;">
+            const arrowSvgYear = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='${currentYear !== 'ALL' ? '%23ffde21' : '%23a0a0a0'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>`;
+
+            let yearFilterHtml = `<select class="dropdown-filter" data-filter="year" style="padding: 8px 40px 8px 20px; border-radius: var(--radius-full); border: 1px solid ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background-color: ${currentYear !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; background-image: url('${arrowSvgYear}'); background-repeat: no-repeat; background-position: right 16px center; color: ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 160px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
               <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả năm</option>
               ${currentYearsArray.map(y => `<option value="${y}" style="background: #1a1a1a; color: #fff;" ${currentYear === String(y) ? 'selected' : ''}>Năm ${y}</option>`).join('')}
             </select>`;
