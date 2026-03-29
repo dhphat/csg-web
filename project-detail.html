@@ -130,7 +130,12 @@
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 40px;">
               <span class="project-badge" style="margin-bottom: 0;">${projectTag}</span>
               <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">${project.year !== 'Chuyên mục' ? project.year : ''}</span>
-              ${project.link ? `<a href="${project.link}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--radius-full); background: var(--gold-primary); color: #000; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; margin-left: 8px;"><i class="fas fa-external-link-alt"></i> Liên kết dự án</a>` : ''}
+              ${(() => {
+                let linkItems = [];
+                if (project.link) linkItems.push({label: 'Liên kết dự án', url: project.link});
+                if (project.links && project.links.length > 0) linkItems = project.links;
+                return linkItems.map(l => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--radius-full); background: var(--gold-primary); color: #000; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; margin-left: 8px;"><i class="fas fa-external-link-alt"></i> ${l.label || 'Liên kết'}</a>`).join('');
+              })()}
             </div>
 
             <!-- Timeline/Milestones -->

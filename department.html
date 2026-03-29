@@ -52,9 +52,9 @@
       const deptMembersHtml = (dept.members && dept.members.length > 0) ? `
         <div class="dept-managers" style="margin-top:32px; display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
           ${dept.members.map(m => `
-            <div style="background:rgba(255,255,255,0.05); padding:16px 32px; border-radius:12px; border:1px solid rgba(255,222,33,0.2); min-width:220px; text-align:center; backdrop-filter:blur(10px);">
-              <div style="color:var(--gold-primary); font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">${m.role}</div>
-              <div style="color:#fff; font-size:1.15rem; font-weight:600;">${m.name}</div>
+            <div class="dept-manager-card" style="background:rgba(255,255,255,0.05); padding:16px 32px; border-radius:12px; border:1px solid rgba(255,222,33,0.2); min-width:220px; text-align:center; backdrop-filter:blur(10px);">
+              <div class="dept-manager-role" style="color:var(--gold-primary); font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">${m.role}</div>
+              <div class="dept-manager-name" style="color:#fff; font-size:1.15rem; font-weight:600;">${m.name}</div>
             </div>
           `).join('')}
         </div>

@@ -140,3 +140,50 @@
     max-width: 300px;
   }
 }
+
+/* Mobile Overrides for V2 Layout */
+@media (max-width: 768px) {
+  .member-hero-subtitle {
+    font-size: 0.95rem !important;
+  }
+  .member-president-title, .member-board-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 40px !important;
+  }
+  .v2-member-card-president {
+    width: calc(33.333% - 16px) !important;
+    min-width: unset !important;
+    padding: 40px 10px 16px !important;
+  }
+  .v2-member-card-president .v2-member-name {
+    font-size: 0.85rem !important;
+  }
+  .v2-member-card-president .v2-member-role {
+    font-size: 0.7rem !important;
+  }
+  .v2-member-card-board {
+    width: calc(50% - 12px) !important;
+    min-width: unset !important;
+  }
+  .timeline-row {
+    justify-content: flex-start;
+  }
+  .member-timeline-container {
+    padding-left: 40px !important;
+  }
+  .timeline-line {
+    left: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .v2-member-card-president {
+    width: calc(33.333% - 10px) !important;
+    padding: 30px 8px 12px !important;
+  }
+  .v2-member-card-president .v2-member-avatar {
+    width: 50px !important;
+    height: 50px !important;
+    top: -25px !important;
+  }
+}

@@ -403,16 +403,28 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .award-grid {
-    gap: 16px;
-  }
-  
-  .award-card img {
-    height: 180px;
+  .award-hero-title, .sponsors-title, .ecosystem-title, .project-stat-title, .section-title {
+    font-size: 1.4rem !important;
   }
 
-  .award-hero-title {
-    font-size: 1.8rem;
+  .award-grid {
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .award-card {
+    width: calc(33.333% - 8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .award-card img {
+    height: 100px;
+    margin-bottom: 8px;
+  }
+  .award-card-info h3 {
+    font-size: 0.75rem;
+    text-align: center;
   }
 
   .project-stat-card,
@@ -435,7 +447,43 @@
   }
 
   .sponsor-item {
-    width: 110px;
-    height: 65px;
+    width: 100px;
+    height: 60px;
+    padding: 8px;
+  }
+  .collaborator-item {
+    width: 100px;
+  }
+  .collaborator-avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ecosystem-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .eco-total-card {
+    grid-column: 1 / -1;
+    min-width: unset;
+  }
+  .eco-channel-card {
+    min-width: unset !important;
+    padding: 12px !important;
+    gap: 10px !important;
+    text-align: left;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .eco-channel-info {
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .award-card {
+    width: calc(50% - 6px);
   }
 }

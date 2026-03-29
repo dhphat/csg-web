@@ -202,7 +202,8 @@
 
 @media (max-width: 768px) {
   .projects-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
   }
 
   .featured-card {
@@ -212,6 +213,21 @@
 
 @media (max-width: 480px) {
   .projects-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .project-card-info {
+    padding: 10px 12px !important;
+  }
+  .project-card-info h4 {
+    font-size: 0.8rem !important;
+    white-space: normal !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .project-card-info p {
+    font-size: 0.7rem !important;
   }
 }

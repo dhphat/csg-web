@@ -99,4 +99,20 @@
   .dept-team-block.reverse {
     direction: ltr;
   }
+
+  /* Manager Box Overrides */
+  .dept-managers {
+    gap: 12px !important;
+  }
+  .dept-manager-card {
+    min-width: calc(50% - 6px) !important;
+    padding: 12px !important;
+  }
+  .dept-manager-role {
+    font-size: 0.7rem !important;
+    letter-spacing: 1px !important;
+  }
+  .dept-manager-name {
+    font-size: 0.95rem !important;
+  }
 }

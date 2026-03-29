@@ -140,3 +140,48 @@
     margin-right: auto;
   }
 }
+
+/* V2 Layout Overrides on Mobile */
+@media (max-width: 768px) {
+  .hof-hero-subtitle {
+    font-size: 0.95rem !important;
+  }
+  
+  .hof-tabs-header, .yearly-filter, .semester-filter {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 12px !important;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hof-tabs-header::-webkit-scrollbar, .yearly-filter::-webkit-scrollbar, .semester-filter::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .main-tab-btn, .sub-tab-btn, .filter-btn {
+    padding: 6px 14px !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
+  }
+  
+  .dropdown-filter {
+    padding: 6px 30px 6px 14px !important;
+    font-size: 0.85rem !important;
+    min-width: auto !important;
+    white-space: nowrap !important;
+  }
+  
+  .hof-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .hof-card-compact {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hof-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
