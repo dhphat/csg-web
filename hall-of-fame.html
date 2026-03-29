@@ -60,6 +60,8 @@
       let currentMainTab = 'individuals'; // 'individuals' or 'collectives'
       let currentSubTab = 'yearly'; // 'yearly' or 'semesters'
       let currentSemester = 'ALL';
+      let currentYear = 'ALL';
+      let currentCategory = 'ALL';
 
       // Distinct semesters are gathered per tab below
 
@@ -70,12 +72,55 @@
         const dataSrc = currentMainTab === 'individuals' ? hallOfFame.individuals : hallOfFame.collectives;
 
         if (currentSubTab === 'yearly') {
+          let currentYearsArray = [];
+          let currentCategoriesArray = [];
+
           if (dataSrc && dataSrc.yearly) {
-            cardsHtml = dataSrc.yearly.map(y => 
-              y.categories.map(c => 
+            currentYearsArray = Array.from(new Set(dataSrc.yearly.map(y => y.year)));
+            
+            dataSrc.yearly.forEach(y => {
+              y.categories.forEach(c => {
+                if (!currentCategoriesArray.includes(c.name)) {
+                  currentCategoriesArray.push(c.name);
+                }
+              });
+            });
+          }
+
+          if (currentYearsArray.length > 0 || currentCategoriesArray.length > 0) {
+            let categoryFilterHtml = `<select class="dropdown-filter" data-filter="category" style="padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentCategory !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; outline: none; cursor: pointer; min-width: 200px; appearance: auto;">
+              <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả danh hiệu</option>
+              ${currentCategoriesArray.map(c => `<option value="${c}" style="background: #1a1a1a; color: #fff;" ${currentCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>`;
+
+            let yearFilterHtml = `<select class="dropdown-filter" data-filter="year" style="padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentYear !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; outline: none; cursor: pointer; min-width: 150px; appearance: auto;">
+              <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả năm</option>
+              ${currentYearsArray.map(y => `<option value="${y}" style="background: #1a1a1a; color: #fff;" ${currentYear === String(y) ? 'selected' : ''}>Năm ${y}</option>`).join('')}
+            </select>`;
+
+            filterHtml = `
+              <div class="yearly-filter" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                ${categoryFilterHtml}
+                ${yearFilterHtml}
+              </div>
+            `;
+          }
+
+          if (dataSrc && dataSrc.yearly) {
+            let filteredYearly = dataSrc.yearly;
+            if (currentYear !== 'ALL') {
+              filteredYearly = filteredYearly.filter(y => String(y.year) === String(currentYear));
+            }
+
+            cardsHtml = filteredYearly.map(y => {
+              let filteredCategories = y.categories;
+              if (currentCategory !== 'ALL') {
+                filteredCategories = filteredCategories.filter(c => c.name === currentCategory);
+              }
+              return filteredCategories.map(c => 
                 c.members.map(m => createCard(m.recipient, m.image, c.name + ' ' + y.year)).join('')
-              ).join('')
-            ).join('');
+              ).join('');
+            }).join('');
           }
         } else {
           // Semesters
@@ -144,6 +189,9 @@
         document.querySelectorAll('.main-tab-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
             currentMainTab = e.target.getAttribute('data-main-tab');
+            currentSemester = 'ALL';
+            currentYear = 'ALL';
+            currentCategory = 'ALL';
             renderContent();
           });
         });
@@ -152,6 +200,8 @@
           btn.addEventListener('click', (e) => {
             currentSubTab = e.target.getAttribute('data-sub-tab');
             currentSemester = 'ALL'; // Reset filter when switching
+            currentYear = 'ALL';
+            currentCategory = 'ALL';
             renderContent();
           });
         });
@@ -159,6 +209,18 @@
         document.querySelectorAll('.filter-btn').forEach(btn => {
           btn.addEventListener('click', (e) => {
             currentSemester = e.target.getAttribute('data-sem');
+            renderContent();
+          });
+        });
+
+        document.querySelectorAll('.dropdown-filter').forEach(select => {
+          select.addEventListener('change', (e) => {
+            const filterType = e.target.getAttribute('data-filter');
+            if (filterType === 'year') {
+              currentYear = e.target.value;
+            } else if (filterType === 'category') {
+              currentCategory = e.target.value;
+            }
             renderContent();
           });
         });
