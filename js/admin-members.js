@@ -44,6 +44,8 @@ export function renderMembers(siteData, esc) {
           </div>
         </div>
         <div class="admin-item-actions">
+          <button class="btn-icon" data-action="move-up-board-member" data-index="${realIdx}" ${mi === 0 ? 'disabled style="opacity:0.2; pointer-events:none;"' : ''} title="Di chuyển lên"><i class="fas fa-arrow-up"></i></button>
+          <button class="btn-icon" data-action="move-down-board-member" data-index="${realIdx}" ${mi === membersByLevel[lv].length - 1 ? 'disabled style="opacity:0.2; pointer-events:none;"' : ''} title="Di chuyển xuống"><i class="fas fa-arrow-down"></i></button>
           <button class="btn-icon" data-action="edit-board-member" data-index="${realIdx}"><i class="fas fa-pen"></i></button>
           <button class="btn-icon danger" data-action="delete-board-member" data-index="${realIdx}"><i class="fas fa-trash"></i></button>
         </div>
@@ -81,6 +83,42 @@ export function handleMemberAction(action, index, siteData, showModal, renderSec
 
     case 'add-board-member': showMemberModal(null, 0, siteData, showModal, renderSection); break;
     case 'edit-board-member': showMemberModal(index, 0, siteData, showModal, renderSection); break;
+    case 'move-up-board-member': {
+      const targetMember = siteData.boardGenerations[0].members[index];
+      const targetLevel = targetMember.level || 1;
+      let prevSameLevelIdx = -1;
+      for (let i = index - 1; i >= 0; i--) {
+        if ((siteData.boardGenerations[0].members[i].level || 1) === targetLevel) {
+          prevSameLevelIdx = i;
+          break;
+        }
+      }
+      if (prevSameLevelIdx !== -1) {
+        [siteData.boardGenerations[0].members[index], siteData.boardGenerations[0].members[prevSameLevelIdx]] = 
+        [siteData.boardGenerations[0].members[prevSameLevelIdx], siteData.boardGenerations[0].members[index]];
+        window.setDirty(true);
+        renderSection('members');
+      }
+      break;
+    }
+    case 'move-down-board-member': {
+      const targetMember = siteData.boardGenerations[0].members[index];
+      const targetLevel = targetMember.level || 1;
+      let nextSameLevelIdx = -1;
+      for (let i = index + 1; i < siteData.boardGenerations[0].members.length; i++) {
+        if ((siteData.boardGenerations[0].members[i].level || 1) === targetLevel) {
+          nextSameLevelIdx = i;
+          break;
+        }
+      }
+      if (nextSameLevelIdx !== -1) {
+        [siteData.boardGenerations[0].members[index], siteData.boardGenerations[0].members[nextSameLevelIdx]] = 
+        [siteData.boardGenerations[0].members[nextSameLevelIdx], siteData.boardGenerations[0].members[index]];
+        window.setDirty(true);
+        renderSection('members');
+      }
+      break;
+    }
     case 'delete-board-member':
       if (confirm('Xóa thành viên này?')) { siteData.boardGenerations[0].members.splice(index, 1); window.setDirty(true); renderSection('members'); }
       break;
