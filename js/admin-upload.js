@@ -171,6 +171,8 @@ export function bindUploadEvents() {
           preview.innerHTML = `<img src="${publicUrl}" class="upload-preview-img" crossorigin="anonymous" />`;
           status.textContent = 'Đã tải lên ✓ (Cắt xong)';
           status.style.color = '#00D13B';
+          // trigger change event so modal knows data changed
+          urlInput.dispatchEvent(new Event('change'));
         } else {
           status.textContent = 'Lỗi tải lên!';
           status.style.color = '#ff4444';
