@@ -200,7 +200,7 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
             </div>
             
             <div class="form-row">
-              <div class="form-group"><label>Subtitle (Dòng phụ)</label><input type="text" id="pm-subtitle" value="${esc(currentSubtitle)}"></div>
+              <div class="form-group"><label>Mô tả ngắn gọn</label><input type="text" id="pm-subtitle" value="${esc(currentSubtitle)}"></div>
               ${!isCat ? `
               <div class="form-group"><label>Thể loại</label>
                 <select id="pm-category" style="width:100%; background:var(--bg-primary); color:var(--text-primary); border:1px solid var(--border-color); padding:8px; border-radius:4px;">
@@ -209,16 +209,8 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
               </div>` : ''}
             </div>
 
-            <div class="form-group">
-              <label>${isCat ? 'Logo chuyên mục' : 'Poster dự án'}</label>
-              ${imageUploadField(currentImage, 'pm-img', 'projects')}
-            </div>
-            <div class="form-group">
-              <label>Ảnh bìa trang chi tiết</label>
-              ${imageUploadField(currentBanner, 'pm-banner', 'projects')}
-            </div>
             ${!isCat ? `
-            <div class="form-row" style="background: rgba(255,222,33,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,222,33,0.2); margin-top: 20px;">
+            <div class="form-row" style="background: rgba(255,222,33,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,222,33,0.2); margin-top: 10px; margin-bottom: 20px;">
               <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 12px; cursor: pointer;">
                 <input type="checkbox" id="pm-featured" ${currentFeatured ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
                 <label for="pm-featured" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff;">NỔI BẬT</label>
@@ -236,6 +228,17 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
 
           <!-- CỘT PHẢI: QUẢN LÝ DANH SÁCH -->
           <div class="modal-dynamic-lists" style="flex:1.8; max-height:70vh; overflow-y:auto; padding-right:12px; border-left: 1px solid #333; padding-left: 20px;">
+            <div class="form-row" style="margin-bottom: 24px; gap: 20px;">
+              <div class="form-group" style="flex:1;">
+                <label style="color:var(--gold-primary); font-weight:700;">${isCat ? 'LOGO CHUYÊN MỤC' : 'POSTER DỰ ÁN'}</label>
+                ${imageUploadField(currentImage, 'pm-img', 'projects')}
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label style="color:var(--gold-primary); font-weight:700;">ẢNH BÌA TRANG CHI TIẾT</label>
+                ${imageUploadField(currentBanner, 'pm-banner', 'projects')}
+              </div>
+            </div>
+
             <div class="modal-list-title"><span>CÁC MỐC THỜI GIAN (Dùng để xác định Năm dự án)</span></div>
             ${milestonesHtml || '<p style="color:#666;margin-bottom:16px;">Vui lòng tạo ít nhất 1 mốc thời gian.</p>'}
             <button class="btn-add" style="width:100%;justify-content:center;padding:12px;border-style:dashed;margin-bottom:32px;" onclick="window._projModalAdd('milestone')"><i class="fas fa-plus"></i> THÊM MỐC THỜI GIAN</button>
