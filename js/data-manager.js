@@ -297,7 +297,7 @@ const DataManager = {
   _getDefaults() {
     return {
       general: { siteName: "Cóc Sài Gòn", siteTagline: "Câu lạc bộ Truyền thông", logoUrl: "/assets/logo/logo.svg", description: "", socialLinks: { facebook: "#", instagram: "#", tiktok: "#", youtube: "#" } },
-      nav: [ { label: "Trang chủ", href: "/" }, { label: "Dự án", href: "/projects" }, { label: "Vinh danh", href: "/hall-of-fame" }, { label: "Thành viên", href: "/member" }, { label: "Ấn tượng", href: "/achievement" }, { label: "Về Cóc", href: "/about" } ],
+      nav: [ { label: "Trang chủ", href: "/" }, { label: "Dự án", href: "/project" }, { label: "Vinh danh", href: "/hall-of-fame" }, { label: "Thành viên", href: "/member" }, { label: "Ấn tượng", href: "/achievement" }, { label: "Về Cóc", href: "/about" } ],
       home: { hero: { banners: [] }, diary: { title: "", tag: "", cardTitle: "", cardDesc: "", cardImage: "" }, gallery: { title: "", items: [] }, stats: { title: "Những con số ấn tượng", items: [] }, testimonials: { title: "", items: [] } },
       projectCategories: [], projects: [], awards: [], departments: [],
       about: { quote: "", introText: "", blocks: [], benefits: { title: "", items: [] } },
