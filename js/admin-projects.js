@@ -1,6 +1,8 @@
 import { imageUploadField, getUploadedUrl } from './admin-upload.js';
 import { setNestedValue } from './admin-state.js';
 
+const PROJECT_CATEGORIES = ['Event', 'Talkshow', 'Cuộc thi', 'Diễn đàn', 'Workshop', 'Triển lãm', 'Teambuilding', 'Festival', 'Concert', 'Từ thiện', 'Webinar', 'Âm nhạc'];
+
 export function renderProjects(siteData, esc) {
   const realProjects = siteData.projects.filter(p => p.year !== 'Chuyên mục');
   const items = realProjects.map((p) => {
@@ -16,7 +18,7 @@ export function renderProjects(siteData, esc) {
           <img src="${p.image}" style="width:60px;height:75px;object-fit:cover;border-radius:8px;" />
           <div>
             <div class="admin-item-title" style="font-size:1.1rem;margin-bottom:4px;">${esc(p.title)}</div>
-            <div class="admin-item-sub" style="margin-bottom:8px;">${esc(p.subtitle)} • Tác giả: ${esc(p.author || 'CSG')} • Năm: ${p.year}</div>
+            <div class="admin-item-sub" style="margin-bottom:8px;">${esc(p.category || 'event')} • ${esc(p.subtitle)} • Tác giả: ${esc(p.author || 'CSG')} • Năm: ${p.year}</div>
             <div>${tags.join('')}</div>
           </div>
         </div>
@@ -141,6 +143,7 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
   let currentSubtitle = p.subtitle || '';
   let currentImage = p.image || '';
   let currentBanner = p.banner || '';
+  let currentCategory = p.category || (forceCategory ? 'category' : 'event');
   let currentFeatured = p.featured;
   let currentOngoing = p.ongoing;
   let currentDesc = p.description || '';
@@ -198,6 +201,12 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
             
             <div class="form-row">
               <div class="form-group"><label>Subtitle (Dòng phụ)</label><input type="text" id="pm-subtitle" value="${esc(currentSubtitle)}"></div>
+              ${!isCat ? `
+              <div class="form-group"><label>Thể loại</label>
+                <select id="pm-category" style="width:100%; background:var(--bg-primary); color:var(--text-primary); border:1px solid var(--border-color); padding:8px; border-radius:4px;">
+                  ${PROJECT_CATEGORIES.map(cat => `<option value="${cat.toLowerCase()}" ${currentCategory.toLowerCase() === cat.toLowerCase() ? 'selected' : ''}>${cat}</option>`).join('')}
+                </select>
+              </div>` : ''}
             </div>
 
             <div class="form-group">
@@ -268,7 +277,7 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
         title: overlay.querySelector('#pm-title').value,
         subtitle: overlay.querySelector('#pm-subtitle').value,
         year: derivedYear,
-        category: forceCategory ? 'category' : 'event',
+        category: forceCategory ? 'category' : (overlay.querySelector('#pm-category')?.value || 'event'),
         image: getUploadedUrl('pm-img') || p.image,
         banner: getUploadedUrl('pm-banner') || p.banner,
         description: overlay.querySelector('#pm-desc').value,
@@ -321,6 +330,8 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
     if (elId) currentId = elId.value;
     if (elTitle) currentTitle = elTitle.value;
     if (elSubtitle) currentSubtitle = elSubtitle.value;
+    const elCategory = overlay.querySelector('#pm-category');
+    if (elCategory) currentCategory = elCategory.value;
     if (elDesc) currentDesc = elDesc.value;
     if (elFeatured) currentFeatured = elFeatured.checked;
     if (elOngoing) currentOngoing = elOngoing.checked;
