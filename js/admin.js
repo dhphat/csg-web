@@ -173,7 +173,7 @@ document.body.addEventListener('click', (e) => {
     handleProjectAction(action, index, btn.dataset, siteData, showModal, showSimpleModal, renderSection);
   } else if (action.includes('dept') || action.includes('team')) {
     handleDeptAction(action, index, siteData, renderSection);
-  } else if (['add-president','edit-president','delete-president','add-board-member','edit-board-member','delete-board-member'].includes(action)) {
+  } else if (['add-president','edit-president','delete-president','add-board-member','edit-board-member','delete-board-member','move-up-board-member','move-down-board-member'].includes(action)) {
     handleMemberAction(action, index, siteData, showModal, renderSection);
   } else if (action.includes('award') || action.includes('eco-channel') || action.includes('collaborator') || action.includes('sponsor') || action.includes('hof')) {
     handleContentAction(action, index, btn.dataset, siteData, showModal, showSimpleModal, renderSection);
