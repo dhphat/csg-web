@@ -91,8 +91,19 @@
         `;
       }
 
-      // 3. Recent Projects
-      const recent = projects.filter(p => !p.ongoing && p.year !== 'Chuyên mục').slice(0, 4);
+      // 3. Recent Projects (Sort by latest milestone date)
+      const recent = projects
+        .filter(p => !p.ongoing && p.year !== 'Chuyên mục')
+        .map(p => {
+          const milestoneDates = (p.milestones || [])
+            .map(m => m.date)
+            .filter(d => !!d)
+            .map(d => new Date(d).getTime());
+          const latestDate = milestoneDates.length > 0 ? Math.max(...milestoneDates) : 0;
+          return { ...p, _latestDate: latestDate };
+        })
+        .sort((a, b) => b._latestDate - a._latestDate)
+        .slice(0, 4);
       const recentCards = recent.map(p => `
           <a href="/project/${p.id}" class="project-card-home reveal" style="display:flex; flex-direction:column; height: 100%; transition: all var(--transition-fast);">
             <div style="aspect-ratio: 4/5; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 16px; flex-shrink: 0;">

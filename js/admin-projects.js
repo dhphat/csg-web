@@ -218,9 +218,15 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
               ${imageUploadField(currentBanner, 'pm-banner', 'projects')}
             </div>
             ${!isCat ? `
-            <div class="form-row">
-              <div class="form-group"><label><input type="checkbox" id="pm-featured" ${currentFeatured ? 'checked' : ''}> Đánh dấu Nổi Bật</label></div>
-              <div class="form-group"><label><input type="checkbox" id="pm-ongoing" ${currentOngoing ? 'checked' : ''}> Đang diễn ra</label></div>
+            <div class="form-row" style="background: rgba(255,222,33,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,222,33,0.2); margin-top: 20px;">
+              <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                <input type="checkbox" id="pm-featured" ${currentFeatured ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
+                <label for="pm-featured" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff;">NỔI BẬT</label>
+              </div>
+              <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                <input type="checkbox" id="pm-ongoing" ${currentOngoing ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
+                <label for="pm-ongoing" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff;">ĐANG DIỄN RA</label>
+              </div>
             </div>` : ''}
             <div class="form-group">
               <label>Chi tiết ${isCat ? 'Chuyên mục' : 'Dự án'}</label>
@@ -254,6 +260,23 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
     const mSave = overlay.querySelector('#pm-save');
     overlay.addEventListener('input', () => { mSave.disabled = false; mSave.style.opacity = '1'; });
     overlay.addEventListener('change', () => { mSave.disabled = false; mSave.style.opacity = '1'; });
+
+    // Slug validation logic
+    const idInput = overlay.querySelector('#pm-id');
+    if (idInput) {
+      idInput.onblur = (e) => {
+        let val = e.target.value;
+        if (!val) return;
+        // Normalize Vietnamese: remove accents, spaces, special chars
+        val = val.toLowerCase()
+                 .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                 .replace(/đ/g, 'd')
+                 .replace(/[^a-z0-9-]/g, '-')
+                 .replace(/-+/g, '-')
+                 .replace(/^-|-$/g, '');
+        e.target.value = val;
+      };
+    }
 
     overlay.querySelector('#pm-cancel').onclick = () => { cleanup(); overlay.remove(); };
     overlay.querySelector('#pm-close').onclick = () => { cleanup(); overlay.remove(); };
