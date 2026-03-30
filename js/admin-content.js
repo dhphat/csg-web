@@ -6,6 +6,8 @@ export function renderAchievements(siteData, esc) {
         <div class="admin-item-title">${esc(a.title)}</div>
       </div>
       <div class="admin-item-actions">
+        <button class="btn-icon" data-action="move-up-award" data-index="${i}" ${i === 0 ? 'disabled style="opacity:0.2; pointer-events:none;"' : ''} title="Di chuyển lên"><i class="fas fa-arrow-up"></i></button>
+        <button class="btn-icon" data-action="move-down-award" data-index="${i}" ${i === siteData.awards.length - 1 ? 'disabled style="opacity:0.2; pointer-events:none;"' : ''} title="Di chuyển xuống"><i class="fas fa-arrow-down"></i></button>
         <button class="btn-icon" data-action="edit-award" data-index="${i}"><i class="fas fa-pen"></i></button>
         <button class="btn-icon danger" data-action="delete-award" data-index="${i}"><i class="fas fa-trash"></i></button>
       </div>
@@ -185,6 +187,22 @@ export function handleContentAction(action, index, dataset, siteData, showModal,
   switch (action) {
     case 'add-award': showAwardModal(undefined, siteData, showModal, renderSection); break;
     case 'edit-award': showAwardModal(index, siteData, showModal, renderSection); break;
+    case 'move-up-award': {
+      if (index > 0) {
+        [siteData.awards[index], siteData.awards[index - 1]] = [siteData.awards[index - 1], siteData.awards[index]];
+        if (window.setDirty) window.setDirty(true);
+        renderSection('achievements');
+      }
+      break;
+    }
+    case 'move-down-award': {
+      if (index < siteData.awards.length - 1) {
+        [siteData.awards[index], siteData.awards[index + 1]] = [siteData.awards[index + 1], siteData.awards[index]];
+        if (window.setDirty) window.setDirty(true);
+        renderSection('achievements');
+      }
+      break;
+    }
     case 'delete-award':
       if (confirm('Xóa giải thưởng này?')) { siteData.awards.splice(index, 1); window.setDirty(true); renderSection('achievements'); }
       break;
