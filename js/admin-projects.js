@@ -210,14 +210,14 @@ function showProjectAdvancedModal(index, forceCategory = false, siteData, render
             </div>
 
             ${!isCat ? `
-            <div class="form-row" style="background: rgba(255,222,33,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,222,33,0.2); margin-top: 10px; margin-bottom: 20px;">
+            <div class="form-row" style="background: rgba(255,222,33,0.05); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,222,33,0.2); margin-top: 10px; margin-bottom: 20px; display: flex !important; flex-direction: row; gap: 40px; align-items: center;">
               <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 12px; cursor: pointer;">
                 <input type="checkbox" id="pm-featured" ${currentFeatured ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
-                <label for="pm-featured" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff;">NỔI BẬT</label>
+                <label for="pm-featured" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: 1px;">NỔI BẬT</label>
               </div>
               <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 12px; cursor: pointer;">
                 <input type="checkbox" id="pm-ongoing" ${currentOngoing ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
-                <label for="pm-ongoing" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff;">ĐANG DIỄN RA</label>
+                <label for="pm-ongoing" style="margin: 0; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: 1px;">ĐANG DIỄN RA</label>
               </div>
             </div>` : ''}
             <div class="form-group">
