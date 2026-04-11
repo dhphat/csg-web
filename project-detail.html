@@ -49,6 +49,19 @@
 
       document.title = `${project.title} - Cóc Sài Gòn`;
 
+      // Update OG meta tags for social sharing
+      const ogImage = project.banner || project.image || '';
+      if (ogImage) {
+        document.querySelector('meta[property="og:image"]')?.setAttribute('content', ogImage);
+        document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', ogImage);
+      }
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) { ogTitle.setAttribute('content', `${project.title} - Cóc Sài Gòn`); }
+      else { const m = document.createElement('meta'); m.setAttribute('property', 'og:title'); m.setAttribute('content', `${project.title} - Cóc Sài Gòn`); document.head.appendChild(m); }
+      const twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) { twTitle.setAttribute('content', `${project.title} - Cóc Sài Gòn`); }
+      else { const m = document.createElement('meta'); m.setAttribute('name', 'twitter:title'); m.setAttribute('content', `${project.title} - Cóc Sài Gòn`); document.head.appendChild(m); }
+
       // Determine Tag
       let projectTag = project.category;
       if (project.year === 'Chuyên mục') {

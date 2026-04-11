@@ -2,8 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/project/:id", "destination": "/project-detail" },
-    { "source": "/department/:id", "destination": "/department" },
+    { "source": "/project/:id", "destination": "/api/og" },
+    { "source": "/department/:id", "destination": "/api/og" },
     { "source": "/admin", "destination": "/admin/index.html" }
   ]
 }

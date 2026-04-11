@@ -36,6 +36,38 @@
       const categories = data.projectCategories || [];
       const main = document.getElementById('project-main');
 
+      // === Sorting helper: year DESC, then closest milestone to now ===
+      const now = Date.now();
+      function getClosestMilestoneTimestamp(project) {
+        const milestones = project.milestones || [];
+        if (milestones.length === 0) return null;
+        let closest = null;
+        let minDist = Infinity;
+        for (const m of milestones) {
+          if (!m.date) continue;
+          const ts = new Date(m.date).getTime();
+          if (isNaN(ts)) continue;
+          const dist = Math.abs(ts - now);
+          if (dist < minDist) { minDist = dist; closest = ts; }
+        }
+        return closest;
+      }
+
+      function sortProjects(arr) {
+        return [...arr].sort((a, b) => {
+          // 1. Year descending (newest first)
+          const yearA = parseInt(a.year) || 0;
+          const yearB = parseInt(b.year) || 0;
+          if (yearB !== yearA) return yearB - yearA;
+          // 2. Within same year: closest milestone to now first
+          const tsA = getClosestMilestoneTimestamp(a);
+          const tsB = getClosestMilestoneTimestamp(b);
+          const distA = tsA !== null ? Math.abs(tsA - now) : Infinity;
+          const distB = tsB !== null ? Math.abs(tsB - now) : Infinity;
+          return distA - distB;
+        });
+      }
+
       // 1. Categories
       const catCards = categories.map(c => `
         <a href="/project/${c.id}" class="project-category-item reveal">
@@ -55,7 +87,7 @@
       `;
 
       // 2. Featured
-      const featured = projects.filter(p => p.featured && p.year !== 'Chuyên mục');
+      const featured = sortProjects(projects.filter(p => p.featured && p.year !== 'Chuyên mục'));
       let featuredHtml = '';
       if(featured.length > 0) {
         const featCards = featured.map(p => `
@@ -84,7 +116,7 @@
       }
 
       // 3. All projects
-      const filteredProjects = projects.filter(p => p.year !== 'Chuyên mục');
+      const filteredProjects = sortProjects(projects.filter(p => p.year !== 'Chuyên mục'));
       
       const yearsSet = new Set();
       filteredProjects.forEach(p => p.year && yearsSet.add(p.year));

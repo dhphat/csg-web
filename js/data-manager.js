@@ -193,7 +193,7 @@ const DataManager = {
 
     (d.departments || []).forEach(dept => {
        const dId = dept.id || uuidv4();
-       deptRows.push({ id: dId, name: dept.name, image: dept.image, description: dept.description });
+       deptRows.push({ id: dId, name: dept.name, image: dept.image, thumbnail: dept.thumbnail, description: dept.description });
        (dept.teams || []).forEach(team => {
           const tId = uuidv4();
           teamRows.push({ id: tId, department_id: dId, name: team.name, image: team.image, description: team.description });

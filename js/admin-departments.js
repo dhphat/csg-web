@@ -45,6 +45,7 @@ function showDeptAdvancedModal(index, siteData, renderSection) {
     id: 'new-dept-' + Date.now(),
     name: '',
     image: '',
+    thumbnail: '',
     description: '',
     subDepts: [],
     teams: []
@@ -113,8 +114,12 @@ function showDeptAdvancedModal(index, siteData, renderSection) {
               <div class="form-group" style="flex:2;"><label>Tên Ban</label><input type="text" id="d-name" value="${esc(currentDept.name)}"></div>
             </div>
             <div class="form-group">
-              <label>Ảnh Ban</label>
+              <label>Ảnh Ban (Banner)</label>
               ${imageUploadField(currentDept.image || '', 'd-img', 'departments')}
+            </div>
+            <div class="form-group">
+              <label>Thumbnail (Ảnh chia sẻ mạng xã hội)</label>
+              ${imageUploadField(currentDept.thumbnail || '', 'd-thumb', 'departments')}
             </div>
             <div class="form-group">
               <label>Mô tả Ban</label>
@@ -176,6 +181,7 @@ function showDeptAdvancedModal(index, siteData, renderSection) {
     currentDept.id = overlay.querySelector('#d-id').value;
     currentDept.name = overlay.querySelector('#d-name').value;
     currentDept.image = getUploadedUrl('d-img') || currentDept.image;
+    currentDept.thumbnail = getUploadedUrl('d-thumb') || currentDept.thumbnail;
     currentDept.description = overlay.querySelector('#d-desc').value;
     
     if (currentDept.teams) {
