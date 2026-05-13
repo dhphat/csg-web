@@ -2,6 +2,10 @@
 
 import Renderer from './renderer.js';
 import DataManager from './data-manager.js';
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Analytics
+inject();
 
 // Global promise that resolves when data is loaded
 window.__csgDataReady = (async () => {
