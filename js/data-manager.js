@@ -195,11 +195,11 @@ const DataManager = {
        const dId = dept.id || uuidv4();
        deptRows.push({ id: dId, name: dept.name, image: dept.image, thumbnail: dept.thumbnail, description: dept.description });
        (dept.teams || []).forEach(team => {
-          const tId = uuidv4();
-          teamRows.push({ id: tId, department_id: dId, name: team.name, image: team.image, description: team.description });
-          (team.members || []).forEach(mem => {
-             memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: mem.photo });
-          });
+           const tId = team.id || uuidv4();
+           teamRows.push({ id: tId, department_id: dId, name: team.name, image: team.image, description: team.description });
+           (team.members || []).forEach(mem => {
+              memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: mem.photo });
+           });
        });
        (dept.members || []).forEach(mem => {
           memberRows.push({ id: mem.id || uuidv4(), department_id: dId, type: 'dept_member', name: mem.name, role: mem.role, photo: mem.photo });
@@ -217,45 +217,41 @@ const DataManager = {
     });
 
     try {
-      const replaceTable = async (table, rows) => {
-        const { error: delErr } = await supabase.from(table).delete().not('id', 'is', null);
-        if (delErr) throw new Error(`Delete ${table} failed: ` + delErr.message);
-        
+      // Safe upsert + cleanup: upsert first, then delete orphans
+      const upsertTable = async (table, rows) => {
         if (rows.length > 0) {
-            for (let i = 0; i < rows.length; i += 500) {
-              const { error: insErr } = await supabase.from(table).insert(rows.slice(i, i+500));
-              if (insErr) throw new Error(`Insert ${table} failed: ` + insErr.message);
-            }
+          for (let i = 0; i < rows.length; i += 500) {
+            const { error } = await supabase.from(table).upsert(rows.slice(i, i + 500));
+            if (error) throw new Error(`Upsert ${table} failed: ` + error.message);
+          }
+        }
+        // Delete orphan records (IDs no longer in current data)
+        const currentIds = rows.map(r => r.id);
+        if (currentIds.length > 0) {
+          const { error } = await supabase.from(table).delete().not('id', 'in', `(${currentIds.join(',')})`);
+          if (error) throw new Error(`Cleanup ${table} failed: ` + error.message);
+        } else {
+          const { error } = await supabase.from(table).delete().not('id', 'is', null);
+          if (error) throw new Error(`Delete ${table} failed: ` + error.message);
         }
       };
 
       const { error: setErr } = await supabase.from('csg_settings').upsert(settingsRows);
       if (setErr) throw new Error("Settings upsert failed: " + setErr.message);
-      
-      await replaceTable('csg_projects', projectRows);
-      await replaceTable('csg_awards', awardRows);
-      await replaceTable('csg_collaborators', collabRows);
-      await replaceTable('csg_sponsors', sponsorRows);
-      await replaceTable('csg_media', mediaRows);
-      await replaceTable('csg_hall_of_fame', hofRows);
 
-      // Foreign keys: xóa con trước, cha sau
-      const { error: err1 } = await supabase.from('csg_members').delete().not('id', 'is', null);
-      if(err1) throw err1;
-      const { error: err2 } = await supabase.from('csg_teams').delete().not('id', 'is', null);
-      if(err2) throw err2;
-      const { error: err3 } = await supabase.from('csg_departments').delete().not('id', 'is', null);
-      if(err3) throw err3;
+      await upsertTable('csg_projects', projectRows);
+      await upsertTable('csg_awards', awardRows);
+      await upsertTable('csg_collaborators', collabRows);
+      await upsertTable('csg_sponsors', sponsorRows);
+      await upsertTable('csg_media', mediaRows);
+      await upsertTable('csg_hall_of_fame', hofRows);
 
-      if (deptRows.length > 0) {
-        const { error } = await supabase.from('csg_departments').insert(deptRows);
-        if (error) throw new Error("Dept Insert: " + error.message);
-      }
-      if (teamRows.length > 0) {
-        const { error } = await supabase.from('csg_teams').insert(teamRows);
-        if (error) throw new Error("Team Insert: " + error.message);
-      }
-      if (memberRows.length > 0) await replaceTable('csg_members', memberRows);
+      // Foreign key tables: upsert parent → child order, cleanup child → parent order
+      // 1. Upsert parents first
+      await upsertTable('csg_departments', deptRows);
+      await upsertTable('csg_teams', teamRows);
+      // 2. Upsert/cleanup members (leaves, no FK children)
+      await upsertTable('csg_members', memberRows);
 
       return true;
     } catch (e) {
@@ -309,4 +305,4 @@ const DataManager = {
 };
 
 export default DataManager;
-window.DataManager = DataManager;
+// DataManager is only available via ES module import (not exposed globally for security)

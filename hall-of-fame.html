@@ -28,6 +28,7 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import DataManager from '/js/data-manager.js';
+    import { esc } from '/js/utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
@@ -38,10 +39,10 @@
       const createCard = (recipient, image, title) => `
         <div class="hof-card-compact reveal" style="text-align: center; background: #222222; box-shadow: 0 8px 24px rgba(0,0,0,0.6); padding: 16px; border-radius: var(--radius-md); border: 1px solid #444444; transition: all var(--transition-fast);">
           <div style="aspect-ratio: 4/5; width: 100%; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 16px;">
-            <img src="${image}" alt="${recipient}" style="width: 100%; height: 100%; object-fit: cover;" />
+            <img src="${esc(image)}" alt="${esc(recipient)}" style="width: 100%; height: 100%; object-fit: cover;" />
           </div>
-          <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${recipient}</div>
-          <div style="font-size: 0.8rem; color: var(--gold-primary); text-transform: uppercase; font-weight: 600;">${title}</div>
+          <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${esc(recipient)}</div>
+          <div style="font-size: 0.8rem; color: var(--gold-primary); text-transform: uppercase; font-weight: 600;">${esc(title)}</div>
         </div>
       `;
 
@@ -92,14 +93,14 @@
             
             let categoryFilterHtml = `<select class="dropdown-filter" data-filter="category" style="padding: 8px 40px 8px 20px; border-radius: var(--radius-full); border: 1px solid ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background-color: ${currentCategory !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; background-image: url('${arrowSvgCat}'); background-repeat: no-repeat; background-position: right 16px center; color: ${currentCategory !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 220px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
               <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả danh hiệu</option>
-              ${currentCategoriesArray.map(c => `<option value="${c}" style="background: #1a1a1a; color: #fff;" ${currentCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
+              ${currentCategoriesArray.map(c => `<option value="${esc(c)}" style="background: #1a1a1a; color: #fff;" ${currentCategory === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}
             </select>`;
 
             const arrowSvgYear = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='${currentYear !== 'ALL' ? '%23ffde21' : '%23a0a0a0'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>`;
 
             let yearFilterHtml = `<select class="dropdown-filter" data-filter="year" style="padding: 8px 40px 8px 20px; border-radius: var(--radius-full); border: 1px solid ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background-color: ${currentYear !== 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; background-image: url('${arrowSvgYear}'); background-repeat: no-repeat; background-position: right 16px center; color: ${currentYear !== 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.9rem; outline: none; cursor: pointer; min-width: 160px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
               <option value="ALL" style="background: #1a1a1a; color: #fff;">Tất cả năm</option>
-              ${currentYearsArray.map(y => `<option value="${y}" style="background: #1a1a1a; color: #fff;" ${currentYear === String(y) ? 'selected' : ''}>Năm ${y}</option>`).join('')}
+              ${currentYearsArray.map(y => `<option value="${esc(String(y))}" style="background: #1a1a1a; color: #fff;" ${currentYear === String(y) ? 'selected' : ''}>Năm ${esc(String(y))}</option>`).join('')}
             </select>`;
 
             filterHtml = `
@@ -137,7 +138,7 @@
             let filterButtons = `<button class="filter-btn ${currentSemester === 'ALL' ? 'active' : ''}" data-sem="ALL" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === 'ALL' ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === 'ALL' ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">Tất cả học kỳ</button>`;
             
             currentSemestersArray.forEach(sem => {
-              filterButtons += `<button class="filter-btn ${currentSemester === sem ? 'active' : ''}" data-sem="${sem}" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === sem ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">${sem}</button>`;
+              filterButtons += `<button class="filter-btn ${currentSemester === sem ? 'active' : ''}" data-sem="${esc(sem)}" style="padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--border-color)'}; background: ${currentSemester === sem ? 'rgba(255,222,33,0.1)' : 'transparent'}; color: ${currentSemester === sem ? 'var(--gold-primary)' : 'var(--text-secondary)'}; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">${esc(sem)}</button>`;
             });
 
             filterHtml = `

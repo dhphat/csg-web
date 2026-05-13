@@ -28,6 +28,7 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import DataManager from '/js/data-manager.js';
+    import { esc } from '/js/utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
@@ -44,9 +45,9 @@
       const renderAwards = () => {
         return awards.map(a => `
           <div class="award-card reveal" onclick="openLightbox('${a.image}')">
-            <img src="${a.image}" alt="${a.title}" />
+            <img src="${esc(a.image)}" alt="${esc(a.title)}" />
             <div class="award-card-info">
-              <h3>${a.title}</h3>
+              <h3>${esc(a.title)}</h3>
             </div>
           </div>
         `).join('');
@@ -86,7 +87,7 @@
                     <img src="${c.logo}" alt="${c.name}" />
                   </div>
                   <div class="eco-channel-info">
-                    <span class="eco-channel-name">${c.name}</span>
+                    <span class="eco-channel-name">${esc(c.name)}</span>
                     <span class="eco-channel-followers">${parseFollowers(c.followers).toLocaleString('vi-VN')}</span>
                   </div>
                 </a>
@@ -109,13 +110,13 @@
 
           return `
             <div class="project-stat-card reveal">
-              <img src="${p.image}" alt="${p.title}" class="project-stat-img" />
+              <img src="${esc(p.image)}" alt="${esc(p.title)}" class="project-stat-img" />
               <div class="project-stat-content">
-                <h3 class="project-stat-title">${p.title}</h3>
+                <h3 class="project-stat-title">${esc(p.title)}</h3>
                 <div class="stat-numbers-grid">
                   ${statItems}
                 </div>
-                <p class="project-stat-desc">${p.description || ''}</p>
+                <p class="project-stat-desc">${esc(p.description || '')}</p>
               </div>
             </div>
           `;
@@ -143,9 +144,9 @@
               ${collaborators.map(c => `
                 <div class="collaborator-item reveal">
                   <div class="collaborator-avatar">
-                    <img src="${c.photo}" alt="${c.name}" />
+                    <img src="${esc(c.photo)}" alt="${esc(c.name)}" />
                   </div>
-                  <div class="collaborator-name">${c.name}</div>
+                  <div class="collaborator-name">${esc(c.name)}</div>
                 </div>
               `).join('')}
             </div>
@@ -177,7 +178,7 @@
             <div class="container">
               <h2 class="sponsors-title" style="text-align: center;">NHÀ TÀI TRỢ VÀ ĐỐI TÁC</h2>
               <div class="sponsors-grid">
-                ${sponsors.map(s => `<div class="sponsor-item reveal"><img src="${s.logo}" alt="${s.name}" /></div>`).join('')}
+                ${sponsors.map(s => `<div class="sponsor-item reveal"><img src="${esc(s.logo)}" alt="${esc(s.name)}" /></div>`).join('')}
               </div>
               ${renderCollaborators()}
             </div>

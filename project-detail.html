@@ -26,6 +26,7 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import DataManager from '/js/data-manager.js';
+    import { esc } from '/js/utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
@@ -76,8 +77,8 @@
         <div class="project-detail-stats">
           ${statsEntries.map(([k, v]) => `
             <div class="stat-item">
-              <span class="stat-value">${v}</span>
-              <span class="stat-label">${statsLabels[k] || k}</span>
+              <span class="stat-value">${esc(String(v))}</span>
+              <span class="stat-label">${esc(statsLabels[k] || k)}</span>
             </div>
           `).join('')}
         </div>` : '';
@@ -87,7 +88,7 @@
         <div class="project-milestones" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px;">
           ${project.milestones.map(m => `
             <div class="milestone-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
-              <span style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;">${m.label}</span>
+              <span style="color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;">${esc(m.label)}</span>
               <span style="color: var(--gold-primary); font-size: 1.1rem; font-weight: 700;">
                 ${(() => {
                   let d = m.date || '';
@@ -115,7 +116,7 @@
           <div class="gallery-grid">
             ${project.gallery.map((img, idx) => `
               <div class="gallery-item" data-index="${idx}">
-                <img src="${img}" alt="${project.title}" loading="lazy" />
+                <img src="${esc(img)}" alt="${esc(project.title)}" loading="lazy" />
               </div>
             `).join('')}
           </div>
@@ -124,7 +125,7 @@
       const bannerHtml = project.banner ? `
         <!-- Banner fixed aspect ratio -->
         <section class="project-detail-banner" style="width: 100%; aspect-ratio: 2000 / 734; overflow: hidden; background: #000;">
-          <img src="${project.banner}" alt="${project.title}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <img src="${esc(project.banner)}" alt="${esc(project.title)}" style="width: 100%; height: 100%; object-fit: cover;" />
         </section>
       ` : '';
 
@@ -136,18 +137,18 @@
           <div class="container">
             <a href="/project" class="btn-back"><i class="fas fa-arrow-left"></i> Tất cả dự án</a>
             
-            <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--text-primary); line-height: 1.2; margin-bottom: 8px;">${project.title}</h1>
-            <p class="project-subtitle" style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">${project.subtitle || ''}</p>
+            <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--text-primary); line-height: 1.2; margin-bottom: 8px;">${esc(project.title)}</h1>
+            <p class="project-subtitle" style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 24px;">${esc(project.subtitle || '')}</p>
             
             <!-- Tag directly below title/subtitle -->
             <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 40px;">
-              <span class="project-badge" style="margin-bottom: 0;">${projectTag}</span>
-              <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">${project.year !== 'Chuyên mục' ? project.year : ''}</span>
+              <span class="project-badge" style="margin-bottom: 0;">${esc(projectTag)}</span>
+              <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 500;">${project.year !== 'Chuyên mục' ? esc(project.year) : ''}</span>
               ${(() => {
                 let linkItems = [];
                 if (project.link) linkItems.push({label: 'Liên kết dự án', url: project.link});
                 if (project.links && project.links.length > 0) linkItems = project.links;
-                return linkItems.map(l => `<a href="${l.url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--radius-full); background: var(--gold-primary); color: #000; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; margin-left: 8px;"><i class="fas fa-external-link-alt"></i> ${l.label || 'Liên kết'}</a>`).join('');
+                return linkItems.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--radius-full); background: var(--gold-primary); color: #000; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; margin-left: 8px;"><i class="fas fa-external-link-alt"></i> ${esc(l.label || 'Liên kết')}</a>`).join('');
               })()}
             </div>
 
@@ -157,7 +158,7 @@
             <!-- Description -->
             <div class="project-description" style="max-width: 800px; padding: 0 0 48px 0;">
               <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--text-gold); margin-bottom: 16px;">Giới thiệu</h3>
-              <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap;">${project.description}</p>
+              <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap;">${esc(project.description)}</p>
             </div>
 
             <!-- Stats -->

@@ -26,6 +26,7 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import DataManager from '/js/data-manager.js';
+    import { esc } from '/js/utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
@@ -66,8 +67,8 @@
         <div class="dept-managers" style="margin-top:32px; display:flex; flex-wrap:wrap; gap:16px; justify-content:center;">
           ${dept.members.map(m => `
             <div class="dept-manager-card" style="background:rgba(255,255,255,0.05); padding:16px 32px; border-radius:12px; border:1px solid rgba(255,222,33,0.2); min-width:220px; text-align:center; backdrop-filter:blur(10px);">
-              <div class="dept-manager-role" style="color:var(--gold-primary); font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">${m.role}</div>
-              <div class="dept-manager-name" style="color:#fff; font-size:1.15rem; font-weight:600;">${m.name}</div>
+              <div class="dept-manager-role" style="color:var(--gold-primary); font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">${esc(m.role)}</div>
+              <div class="dept-manager-name" style="color:#fff; font-size:1.15rem; font-weight:600;">${esc(m.name)}</div>
             </div>
           `).join('')}
         </div>
@@ -77,19 +78,19 @@
       const teamsHtml = (dept.teams || []).map((team, index) => `
         <div class="dept-team-block ${index % 2 === 0 ? '' : 'reverse'} reveal">
           <div class="dept-team-image">
-            <img src="${team.image}" alt="${team.name}" loading="lazy" />
+            <img src="${esc(team.image)}" alt="${esc(team.name)}" loading="lazy" />
           </div>
           <div class="dept-team-info">
-            <h3>${team.name}</h3>
+            <h3>${esc(team.name)}</h3>
             <div class="dept-team-members">
               ${(team.members || []).map(m => `
                 <div class="dept-member-row">
-                  <span class="dept-member-name">${m.name}</span>
-                  <span class="dept-member-role">${m.role}</span>
+                  <span class="dept-member-name">${esc(m.name)}</span>
+                  <span class="dept-member-role">${esc(m.role)}</span>
                 </div>
               `).join('')}
             </div>
-            <p class="dept-team-desc">${team.description || ''}</p>
+            <p class="dept-team-desc">${esc(team.description || '')}</p>
           </div>
         </div>
       `).join('');
@@ -98,7 +99,7 @@
         ${dept.image ? `
         <!-- Banner fixed aspect ratio -->
         <section class="dept-banner" style="width: 100%; aspect-ratio: 2000 / 734; overflow: hidden; background: #000;">
-          <img src="${dept.image}" alt="${dept.name}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <img src="${esc(dept.image)}" alt="${esc(dept.name)}" style="width: 100%; height: 100%; object-fit: cover;" />
         </section>
         ` : ''}
 
@@ -106,8 +107,8 @@
         <section class="dept-hero" style="${!dept.image ? 'padding-top: 80px;' : 'padding-top: 48px; border-top: none;'}">
           <div class="container">
             <a href="/about" class="btn-back"><i class="fas fa-arrow-left"></i> Về cóc</a>
-            <h1 class="dept-hero-title">${dept.name.toUpperCase()}</h1>
-            <p class="dept-hero-desc" style="white-space: pre-wrap;">${dept.description || ''}</p>
+            <h1 class="dept-hero-title">${esc(dept.name).toUpperCase()}</h1>
+            <p class="dept-hero-desc" style="white-space: pre-wrap;">${esc(dept.description || '')}</p>
             ${deptMembersHtml}
           </div>
         </section>

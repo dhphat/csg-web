@@ -55,8 +55,21 @@ function initLogin() {
 
   if (!btn) return;
 
+  let failCount = 0;
+  let lockUntil = 0;
+
   btn.addEventListener('click', async () => {
+    // Rate limit check
+    const now = Date.now();
+    if (now < lockUntil) {
+      const secsLeft = Math.ceil((lockUntil - now) / 1000);
+      err.textContent = `Vui lòng chờ ${secsLeft} giây trước khi thử lại.`;
+      err.style.display = 'block';
+      return;
+    }
+
     btn.disabled = true;
+    btn.textContent = 'Đang đăng nhập...';
     err.style.display = 'none';
     
     const { error } = await supabase.auth.signInWithPassword({
@@ -65,9 +78,28 @@ function initLogin() {
     });
 
     if (error) {
-      err.textContent = 'Sai email hoặc mật khẩu!';
+      failCount++;
+      // Progressive delay: 2s, 4s, 8s, 16s, max 30s
+      const delaySec = Math.min(Math.pow(2, failCount), 30);
+      lockUntil = Date.now() + delaySec * 1000;
+
+      err.textContent = `Sai email hoặc mật khẩu! Chờ ${delaySec}s để thử lại.`;
       err.style.display = 'block';
-      btn.disabled = false;
+      btn.textContent = 'Đăng nhập';
+      
+      // Countdown on button
+      let remaining = delaySec;
+      btn.disabled = true;
+      const timer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.textContent = 'Đăng nhập';
+        } else {
+          btn.textContent = `Chờ ${remaining}s...`;
+        }
+      }, 1000);
     } else {
       window.location.reload();
     }

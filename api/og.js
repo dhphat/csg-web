@@ -6,8 +6,8 @@
 // 2. For social media crawlers → returns HTML with correct OG tags from Supabase
 // 3. For normal browsers → fetches the actual static page from Vercel CDN and returns it
 
-const SUPABASE_URL = 'https://hesrhmyqtcivzcvaebvf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhlc3JobXlxdGNpdnpjdmFlYnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2MjE0MzMsImV4cCI6MjA5MDE5NzQzM30.cAza33BM21FhacJ-AM7ZQCIMBFxjWxkeu-hn2zIjcyY';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://hesrhmyqtcivzcvaebvf.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 const DEFAULT_OG_IMAGE = 'https://i.ibb.co/xkr0QFB/csg-thumb.jpg';
 
 function escapeHtml(str) {

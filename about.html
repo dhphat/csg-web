@@ -26,6 +26,7 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import DataManager from '/js/data-manager.js';
+    import { esc } from '/js/utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await window.__csgDataReady;
@@ -37,20 +38,20 @@
       // About info blocks
       const blocksHtml = (about.blocks || []).map(b => `
         <div class="about-info-block reveal">
-          <div class="about-info-icon"><i class="${b.icon}"></i></div>
+          <div class="about-info-icon"><i class="${esc(b.icon)}"></i></div>
           <div class="about-info-text">
-            <h3>${b.title}</h3>
-            <p style="white-space: pre-wrap;">${b.content}</p>
+            <h3>${esc(b.title)}</h3>
+            <p style="white-space: pre-wrap;">${esc(b.content)}</p>
           </div>
         </div>
       `).join('');
 
       // Departments list
       const deptsHtml = departments.map(dept => {
-        const subDepts = (dept.teams || []).map(t => `<span class="dept-sub-tag">${t.name}</span>`).join('');
+        const subDepts = (dept.teams || []).map(t => `<span class="dept-sub-tag">${esc(t.name)}</span>`).join('');
         return `
-          <a href="/department/${dept.id}" class="dept-row reveal">
-            <span class="dept-row-name">${dept.name}</span>
+          <a href="/department/${esc(dept.id)}" class="dept-row reveal">
+            <span class="dept-row-name">${esc(dept.name)}</span>
             <span class="dept-row-subs">${subDepts}</span>
             <i class="fas fa-chevron-right dept-row-arrow"></i>
           </a>
@@ -60,9 +61,9 @@
       // Benefits
       const benefitsHtml = (about.benefits?.items || []).map(b => `
         <div class="benefit-card reveal">
-          <img src="${b.image}" alt="${b.title}" class="benefit-card-img" />
-          <h4>${b.title}</h4>
-          <p>${b.description}</p>
+          <img src="${esc(b.image)}" alt="${esc(b.title)}" class="benefit-card-img" />
+          <h4>${esc(b.title)}</h4>
+          <p>${esc(b.description)}</p>
         </div>
       `).join('');
 
@@ -71,14 +72,14 @@
         <section class="about-quote-hero">
           <div class="container">
             <div class="quote-icon">✦</div>
-            <h1 class="about-quote fade-in-up">${about.quote}</h1>
+            <h1 class="about-quote fade-in-up">${esc(about.quote)}</h1>
           </div>
         </section>
 
         <!-- Intro + Info blocks -->
         <section class="about-info-section">
           <div class="container">
-            <p class="about-intro-text reveal">${about.introText}</p>
+            <p class="about-intro-text reveal">${esc(about.introText)}</p>
             <div class="about-info-grid">
               ${blocksHtml}
             </div>
@@ -97,7 +98,7 @@
         <!-- Benefits -->
         <section class="about-benefits-section">
           <div class="container">
-            <h2 class="benefits-title reveal">${about.benefits?.title || ''}</h2>
+            <h2 class="benefits-title reveal">${esc(about.benefits?.title || '')}</h2>
             <div class="benefits-grid">
               ${benefitsHtml}
             </div>
