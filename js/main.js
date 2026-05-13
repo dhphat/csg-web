@@ -7,9 +7,36 @@ import { inject } from '@vercel/analytics';
 // Initialize Vercel Analytics
 inject();
 
+// ===== Loading Screen =====
+// Inject immediately when module loads (before DOMContentLoaded)
+(function injectLoader() {
+  const loader = document.createElement('div');
+  loader.id = 'csg-loader';
+  loader.innerHTML = `
+    <div class="loader-content">
+      <div class="loader-logo-wrap">
+        <div class="loader-ring"></div>
+        <img src="/csg-favicon.png" alt="Cóc Sài Gòn" class="loader-logo" />
+      </div>
+      <div class="loader-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  `;
+  document.body.prepend(loader);
+})();
+
+function hideLoader() {
+  const loader = document.getElementById('csg-loader');
+  if (!loader) return;
+  loader.classList.add('loader-exit');
+  setTimeout(() => loader.remove(), 600);
+}
+
 // Global promise that resolves when data is loaded
 window.__csgDataReady = (async () => {
   await DataManager.load();
+  hideLoader();
   return true;
 })();
 

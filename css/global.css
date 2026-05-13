@@ -389,3 +389,131 @@ button {
   70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 59, 59, 0); opacity: 0.8; }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 59, 59, 0); opacity: 1; }
 }
+
+/* ===== Loading Screen ===== */
+#csg-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+#csg-loader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  animation: bgGridMove 60s linear infinite;
+}
+
+#csg-loader.loader-exit {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  z-index: 1;
+  animation: loaderFadeIn 0.5s ease forwards;
+}
+
+@keyframes loaderFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Logo wrapper with ring */
+.loader-logo-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 50%;
+  animation: logoPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(255, 222, 33, 0.3));
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 24px rgba(255, 222, 33, 0.3)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 40px rgba(255, 222, 33, 0.5)); }
+}
+
+/* Spinning ring */
+.loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 222, 33, 0.1);
+  border-top-color: #FFDE21;
+  border-right-color: rgba(255, 222, 33, 0.4);
+  animation: ringRotate 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 222, 33, 0.3));
+}
+
+.loader-ring::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  border-top-color: rgba(255, 222, 33, 0.2);
+  animation: ringRotate 2s linear infinite reverse;
+}
+
+@keyframes ringRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Bouncing dots */
+.loader-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.loader-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFDE21;
+  box-shadow: 0 0 8px rgba(255, 222, 33, 0.5);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.loader-dots span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.loader-dots span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
