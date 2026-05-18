@@ -36,29 +36,38 @@ const DataManager = {
 
     this._loadPromise = (async () => {
       try {
-        const [
-          { data: settings },
-          { data: projects },
-          { data: departments },
-          { data: teams },
-          { data: members },
-          { data: awards },
-          { data: collaborators },
-          { data: sponsors },
-          { data: media },
-          { data: hof }
-        ] = await Promise.all([
-          supabase.from('csg_settings').select('*'),
-          supabase.from('csg_projects').select('*'),
-          supabase.from('csg_departments').select('*'),
-          supabase.from('csg_teams').select('*'),
-          supabase.from('csg_members').select('*'),
-          supabase.from('csg_awards').select('*'),
-          supabase.from('csg_collaborators').select('*'),
-          supabase.from('csg_sponsors').select('*'),
-          supabase.from('csg_media').select('*'),
-          supabase.from('csg_hall_of_fame').select('*'),
-        ]);
+        const isAdmin = window.location.pathname.startsWith('/admin');
+        let settings, projects, departments, teams, members, awards, collaborators, sponsors, media, hof;
+
+        if (isAdmin) {
+          // Gọi trực tiếp Supabase cho Admin để có dữ liệu mới nhất
+          const results = await Promise.all([
+            supabase.from('csg_settings').select('*'),
+            supabase.from('csg_projects').select('*'),
+            supabase.from('csg_departments').select('*'),
+            supabase.from('csg_teams').select('*'),
+            supabase.from('csg_members').select('*'),
+            supabase.from('csg_awards').select('*'),
+            supabase.from('csg_collaborators').select('*'),
+            supabase.from('csg_sponsors').select('*'),
+            supabase.from('csg_media').select('*'),
+            supabase.from('csg_hall_of_fame').select('*'),
+          ]);
+          settings = results[0].data; projects = results[1].data; departments = results[2].data;
+          teams = results[3].data; members = results[4].data; awards = results[5].data;
+          collaborators = results[6].data; sponsors = results[7].data; media = results[8].data;
+          hof = results[9].data;
+        } else {
+          // Gọi Edge Cached API cho trình duyệt người dùng thường
+          const res = await fetch('/api/data');
+          if (res.ok) {
+            const data = await res.json();
+            settings = data.settings; projects = data.projects; departments = data.departments;
+            teams = data.teams; members = data.members; awards = data.awards;
+            collaborators = data.collaborators; sponsors = data.sponsors; media = data.media;
+            hof = data.hof;
+          }
+        }
 
         const def = this._getDefaults();
 
@@ -143,6 +152,11 @@ const DataManager = {
             })) : [{ term: "Nhiệm kỳ hiện tại", members: [] }];
         }
 
+        // Tối ưu hoá đường dẫn ảnh (Chỉ áp dụng khi không phải admin để tiết kiệm băng thông)
+        if (!isAdmin) {
+          def = this._applyImageOptimization(def);
+        }
+
         this._data = def;
 
         // Save to cache
@@ -182,18 +196,20 @@ const DataManager = {
       { id: 'about', type: 'about', data: d.about }
     ];
 
+    const unopt = (url) => this._unoptimizeImage(url);
+
     const projectRows = (d.projects || []).map(p => ({
         id: p.id || uuidv4(),
         title: p.title || '', subtitle: p.subtitle || '', year: p.year || '',
-        category: p.category || '', image: p.image || '', banner: p.banner || '',
+        category: p.category || '', image: unopt(p.image) || '', banner: unopt(p.banner) || '',
         description: p.description || '', featured: p.featured || false, ongoing: p.ongoing || false,
         links: p.links || [], milestones: p.milestones || [], stats: p.stats || {}
     }));
 
-    const awardRows = (d.awards || []).map(a => ({ id: a.id || uuidv4(), title: a.title, image: a.image }));
-    const collabRows = (d.collaborators || []).map(c => ({ id: c.id || uuidv4(), name: c.name, photo: c.photo }));
-    const sponsorRows = (d.sponsors || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: c.logo }));
-    const mediaRows = (d.mediaEcosystem?.channels || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: c.logo, followers: c.followers, url: c.url }));
+    const awardRows = (d.awards || []).map(a => ({ id: a.id || uuidv4(), title: a.title, image: unopt(a.image) }));
+    const collabRows = (d.collaborators || []).map(c => ({ id: c.id || uuidv4(), name: c.name, photo: unopt(c.photo) }));
+    const sponsorRows = (d.sponsors || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: unopt(c.logo) }));
+    const mediaRows = (d.mediaEcosystem?.channels || []).map(c => ({ id: c.id || uuidv4(), name: c.name, logo: unopt(c.logo), followers: c.followers, url: c.url }));
 
     const hofRows = [];
     ['individuals', 'collectives'].forEach(aType => {
@@ -203,7 +219,7 @@ const DataManager = {
            const pName = period.year || period.semester;
            (period.categories || []).forEach(cat => {
                (cat.members || []).forEach(mem => {
-                   hofRows.push({ id: mem.id || uuidv4(), period_type: pType, period_name: pName, award_type: aType, category: cat.name, recipient: mem.recipient, image: mem.image });
+                   hofRows.push({ id: mem.id || uuidv4(), period_type: pType, period_name: pName, award_type: aType, category: cat.name, recipient: mem.recipient, image: unopt(mem.image) });
                });
            });
         });
@@ -216,27 +232,27 @@ const DataManager = {
 
     (d.departments || []).forEach(dept => {
        const dId = dept.id || uuidv4();
-       deptRows.push({ id: dId, name: dept.name, image: dept.image, thumbnail: dept.thumbnail, description: dept.description });
+       deptRows.push({ id: dId, name: dept.name, image: unopt(dept.image), thumbnail: unopt(dept.thumbnail), description: dept.description });
        (dept.teams || []).forEach(team => {
            const tId = team.id || uuidv4();
-           teamRows.push({ id: tId, department_id: dId, name: team.name, image: team.image, description: team.description });
+           teamRows.push({ id: tId, department_id: dId, name: team.name, image: unopt(team.image), description: team.description });
            (team.members || []).forEach(mem => {
-              memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: mem.photo });
+              memberRows.push({ id: mem.id || uuidv4(), team_id: tId, type: 'team_member', name: mem.name, role: mem.role, photo: unopt(mem.photo) });
            });
        });
        (dept.members || []).forEach(mem => {
-          memberRows.push({ id: mem.id || uuidv4(), department_id: dId, type: 'dept_member', name: mem.name, role: mem.role, photo: mem.photo });
+          memberRows.push({ id: mem.id || uuidv4(), department_id: dId, type: 'dept_member', name: mem.name, role: mem.role, photo: unopt(mem.photo) });
        });
     });
 
     (d.boardGenerations || []).forEach(gen => {
        (gen.members || []).forEach(mem => {
-           memberRows.push({ id: mem.id || uuidv4(), type: 'board_member', name: mem.name, role: mem.role, level: mem.level || 1, photo: mem.photo, term: gen.term });
+           memberRows.push({ id: mem.id || uuidv4(), type: 'board_member', name: mem.name, role: mem.role, level: mem.level || 1, photo: unopt(mem.photo), term: gen.term });
        });
     });
 
     (d.presidents || []).forEach(mem => {
-       memberRows.push({ id: mem.id || uuidv4(), type: 'president', name: mem.name, term: mem.term, generation: mem.gen, photo: mem.photo });
+       memberRows.push({ id: mem.id || uuidv4(), type: 'president', name: mem.name, term: mem.term, generation: mem.gen, photo: unopt(mem.photo) });
     });
 
     try {
@@ -317,6 +333,47 @@ const DataManager = {
       }
     }
     return result;
+  },
+
+  _applyImageOptimization(obj) {
+    if (!obj) return obj;
+    if (Array.isArray(obj)) {
+      return obj.map(item => this._applyImageOptimization(item));
+    }
+    if (typeof obj === 'object') {
+      const newObj = {};
+      for (const key in obj) {
+        if (typeof obj[key] === 'string' && (key === 'image' || key === 'banner' || key === 'photo' || key === 'logo' || key === 'thumbnail' || key === 'bgImage')) {
+          newObj[key] = this._optimizeImage(obj[key]);
+        } else {
+          newObj[key] = this._applyImageOptimization(obj[key]);
+        }
+      }
+      return newObj;
+    }
+    return obj;
+  },
+
+  _optimizeImage(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.startsWith('data:')) return url;
+    if (url.includes('wsrv.nl')) return url;
+    if (url.includes('supabase.co')) {
+      return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1000&output=webp`;
+    }
+    return url;
+  },
+
+  _unoptimizeImage(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.includes('wsrv.nl/?url=')) {
+      try {
+        const urlObj = new URL(url);
+        const original = urlObj.searchParams.get('url');
+        if (original) return decodeURIComponent(original);
+      } catch(e) {}
+    }
+    return url;
   },
 
   _getDefaults() {
