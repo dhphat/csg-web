@@ -69,7 +69,7 @@ const DataManager = {
           }
         }
 
-        const def = this._getDefaults();
+        let def = this._getDefaults();
 
         // 1. Dữ liệu tĩnh (Settings)
         if (settings) {
