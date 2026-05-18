@@ -45,7 +45,7 @@
       const renderAwards = () => {
         return awards.map(a => `
           <div class="award-card reveal" onclick="openLightbox('${a.image}')">
-            <img src="${esc(a.image)}" alt="${esc(a.title)}" />
+            <img src="${esc(a.image)}" alt="${esc(a.title)}" loading="lazy" />
             <div class="award-card-info">
               <h3>${esc(a.title)}</h3>
             </div>
@@ -84,7 +84,7 @@
               ${mediaEcosystem.channels.map(c => `
                 <a href="${c.url}" target="_blank" class="eco-channel-card reveal">
                   <div class="eco-channel-logo">
-                    <img src="${c.logo}" alt="${c.name}" />
+                    <img src="${c.logo}" alt="${c.name}" loading="lazy" />
                   </div>
                   <div class="eco-channel-info">
                     <span class="eco-channel-name">${esc(c.name)}</span>
@@ -110,7 +110,7 @@
 
           return `
             <div class="project-stat-card reveal">
-              <img src="${esc(p.image)}" alt="${esc(p.title)}" class="project-stat-img" />
+              <img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy" class="project-stat-img" />
               <div class="project-stat-content">
                 <h3 class="project-stat-title">${esc(p.title)}</h3>
                 <div class="stat-numbers-grid">
@@ -144,7 +144,7 @@
               ${collaborators.map(c => `
                 <div class="collaborator-item reveal">
                   <div class="collaborator-avatar">
-                    <img src="${esc(c.photo)}" alt="${esc(c.name)}" />
+                    <img src="${esc(c.photo)}" alt="${esc(c.name)}" loading="lazy" />
                   </div>
                   <div class="collaborator-name">${esc(c.name)}</div>
                 </div>
@@ -178,7 +178,7 @@
             <div class="container">
               <h2 class="sponsors-title" style="text-align: center;">NHÀ TÀI TRỢ VÀ ĐỐI TÁC</h2>
               <div class="sponsors-grid">
-                ${sponsors.map(s => `<div class="sponsor-item reveal"><img src="${esc(s.logo)}" alt="${esc(s.name)}" /></div>`).join('')}
+                ${sponsors.map(s => `<div class="sponsor-item reveal"><img src="${esc(s.logo)}" alt="${esc(s.name)}" loading="lazy" /></div>`).join('')}
               </div>
               ${renderCollaborators()}
             </div>

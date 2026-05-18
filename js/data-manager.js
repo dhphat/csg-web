@@ -19,6 +19,21 @@ const DataManager = {
   async load() {
     if (this._loadPromise) return this._loadPromise;
 
+    // Check cache first
+    try {
+      const cached = sessionStorage.getItem('csg_data_cache');
+      const cacheTime = sessionStorage.getItem('csg_data_cache_time');
+      const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+      if (cached && cacheTime && (Date.now() - parseInt(cacheTime) < CACHE_TTL)) {
+        this._data = JSON.parse(cached);
+        this._loaded = true;
+        this._loadPromise = Promise.resolve(this._data);
+        return this._loadPromise;
+      }
+    } catch (e) {
+      console.warn('Cache read error:', e);
+    }
+
     this._loadPromise = (async () => {
       try {
         const [
@@ -129,6 +144,14 @@ const DataManager = {
         }
 
         this._data = def;
+
+        // Save to cache
+        try {
+          sessionStorage.setItem('csg_data_cache', JSON.stringify(def));
+          sessionStorage.setItem('csg_data_cache_time', Date.now().toString());
+        } catch (e) {
+          console.warn('Cache write error:', e);
+        }
 
       } catch (e) {
         console.error('Failed to load multi-tables:', e);
@@ -252,6 +275,12 @@ const DataManager = {
       await upsertTable('csg_teams', teamRows);
       // 2. Upsert/cleanup members (leaves, no FK children)
       await upsertTable('csg_members', memberRows);
+
+      // Clear cache to force reload next time
+      try {
+        sessionStorage.removeItem('csg_data_cache');
+        sessionStorage.removeItem('csg_data_cache_time');
+      } catch(e) {}
 
       return true;
     } catch (e) {

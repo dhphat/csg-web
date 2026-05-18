@@ -61,7 +61,7 @@
       // Benefits
       const benefitsHtml = (about.benefits?.items || []).map(b => `
         <div class="benefit-card reveal">
-          <img src="${esc(b.image)}" alt="${esc(b.title)}" class="benefit-card-img" />
+          <img src="${esc(b.image)}" alt="${esc(b.title)}" loading="lazy" class="benefit-card-img" />
           <h4>${esc(b.title)}</h4>
           <p>${esc(b.description)}</p>
         </div>
